@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.Bills"
+             x:DataType="vm:BillsViewModel"
+             x:Class="InvoicePro.UI.Bills.BillsView">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+        
+        <!-- Header & Filters -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,0,0,20">
+            <TextBlock Grid.Column="0" Text="ALL BILLS / HISTORY" Classes="PageTitle"/>
+            
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" Margin="20,0">
+                <TextBox Text="{Binding SearchText}" Watermark="Search Invoice No or Customer..." Width="250" VerticalAlignment="Center"/>
+                <DatePicker SelectedDate="{Binding SearchDate}" VerticalAlignment="Center"/>
+                <Button Content="CLEAR" Command="{Binding ClearSearchCommand}" VerticalAlignment="Center"/>
+            </StackPanel>
+            
+            <Button Grid.Column="4" Content="BACK TO DASHBOARD" Command="{Binding GoToDashboardCommand}" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding InvoicesList}" SelectedItem="{Binding SelectedInvoice}" 
+                  AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="All" BorderThickness="1" BorderBrush="{DynamicResource AppBorderColor}" Background="White">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Invoice No" Binding="{Binding InvoiceNumber}" Width="Auto"/>
+                <DataGridTextColumn Header="Date" Binding="{Binding InvoiceDate, StringFormat='{}{0:dd-MMM-yyyy}'}" Width="Auto"/>
+                <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="*"/>
+                <DataGridTextColumn Header="Gross (₹)" Binding="{Binding GrossAmount}"/>
+                <DataGridTextColumn Header="Discount (₹)" Binding="{Binding Discount}"/>
+                <DataGridTextColumn Header="Net Amount (₹)" Binding="{Binding NetAmount}"/>
+                <DataGridCheckBoxColumn Header="Cancelled" Binding="{Binding IsCancelled}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <!-- Actions Panel -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+            <Button Content="PRINT BILL" Command="{Binding PrintSelectedCommand}" Classes="Primary" IsEnabled="{Binding SelectedInvoice, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            <Button Content="CANCEL BILL" Command="{Binding CancelSelectedCommand}" Classes="Danger" IsEnabled="{Binding SelectedInvoice, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.Reports"
+             x:DataType="vm:ReportsViewModel"
+             x:Class="InvoicePro.UI.Reports.ReportsView">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,30">
+            <TextBlock Grid.Column="0" Text="SALES REPORT" Classes="PageTitle"/>
+            <Button Grid.Column="2" Content="BACK TO DASHBOARD" Command="{Binding GoToDashboardCommand}" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Filters -->
+        <Border Grid.Row="1" Classes="Card" VerticalAlignment="Top">
+            <StackPanel Spacing="20">
+                <TextBlock Text="Select Date Range" FontWeight="Bold" FontSize="18"/>
+                
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                    <StackPanel>
+                        <TextBlock Text="Start Date"/>
+                        <DatePicker SelectedDate="{Binding StartDate}"/>
+                    </StackPanel>
+                    
+                    <StackPanel>
+                        <TextBlock Text="End Date"/>
+                        <DatePicker SelectedDate="{Binding EndDate}"/>
+                    </StackPanel>
+                    
+                    <Button Content="GENERATE REPORT" Command="{Binding GenerateReportCommand}" Classes="Primary" VerticalAlignment="Bottom"/>
+                </StackPanel>
+                
+                <Rectangle Height="1" Fill="{DynamicResource AppBorderColor}" Margin="0,20"/>
+                
+                <!-- Results -->
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="200, Auto" Margin="0,10">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Total Valid Bills:" FontSize="18" Margin="0,10"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalBills}" FontSize="18" FontWeight="Bold" Margin="0,10"/>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Total Gross Amount:" FontSize="18" Margin="0,10"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TotalGross, StringFormat='₹ {0:N2}'}" FontSize="18" FontWeight="Bold" Margin="0,10"/>
+                    
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Tax Collected:" FontSize="18" Margin="0,10"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalTax, StringFormat='₹ {0:N2}'}" FontSize="18" FontWeight="Bold" Margin="0,10"/>
+                    
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Total Net Sales:" FontSize="22" FontWeight="Bold" Margin="0,20,0,0" Foreground="{DynamicResource AppSuccessColor}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TotalNet, StringFormat='₹ {0:N2}'}" FontSize="22" FontWeight="Bold" Margin="0,20,0,0" Foreground="{DynamicResource AppSuccessColor}"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

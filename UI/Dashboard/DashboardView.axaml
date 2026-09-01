@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.Dashboard"
+             x:DataType="vm:DashboardViewModel"
+             x:Class="InvoicePro.UI.Dashboard.DashboardView">
+    <Grid RowDefinitions="Auto, *">
+        <!-- Header Section -->
+        <Border Grid.Row="0" Background="{DynamicResource AppPrimaryColor}" Padding="30,20">
+            <StackPanel>
+                <TextBlock Text="INVOICE PRO" FontSize="36" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+                <TextBlock Text="Welcome to your dashboard" FontSize="16" Foreground="#E5E5E5"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Dashboard Tiles -->
+        <ScrollViewer Grid.Row="1" Padding="30">
+            <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                
+                <!-- New Bill Tile -->
+                <Border Classes="Card" Width="300" Height="200" Margin="15" Background="{DynamicResource AppPrimaryColor}">
+                    <Button Command="{Binding NewBillCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="➕" FontSize="48" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="CREATE NEW BILL" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Customers Tile -->
+                <Border Classes="Card" Width="250" Height="200" Margin="15">
+                    <Button Command="{Binding CustomersCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="👥" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="CUSTOMERS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Products Tile -->
+                <Border Classes="Card" Width="250" Height="200" Margin="15">
+                    <Button Command="{Binding ProductsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="📦" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="PRODUCTS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- All Bills Tile -->
+                <Border Classes="Card" Width="250" Height="200" Margin="15">
+                    <Button Command="{Binding AllBillsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="ALL BILLS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+                
+                <!-- Reports Tile -->
+                <Border Classes="Card" Width="250" Height="200" Margin="15">
+                    <Button Command="{Binding ReportsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="📊" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="REPORTS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Settings Tile -->
+                <Border Classes="Card" Width="250" Height="200" Margin="15">
+                    <Button Command="{Binding SettingsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="⚙️" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="SETTINGS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+                
+                <!-- Backup Tile -->
+                <Border Classes="Card" Width="250" Height="200" Margin="15">
+                    <Button Command="{Binding BackupCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+                            <TextBlock Text="💾" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="BACKUP" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+            </WrapPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

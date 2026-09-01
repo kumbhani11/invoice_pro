@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.CompanySelection"
+             x:DataType="vm:CompanySelectionViewModel"
+             x:Class="InvoicePro.UI.CompanySelection.CompanySelectionView">
+    
+    <Grid Background="{DynamicResource AppBackgroundColor}">
+        <Border Classes="Card" HorizontalAlignment="Center" VerticalAlignment="Center" Width="500" Padding="40">
+            <StackPanel Spacing="30">
+                <TextBlock Text="INVOICE PRO" Classes="PageTitle" HorizontalAlignment="Center" FontSize="32" Margin="0,0,0,10"/>
+                
+                <TextBlock Text="Select Company to Continue" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center" Foreground="{DynamicResource AppMutedTextColor}"/>
+                
+                <Button Content="AVANI ENTERPRISE" Command="{Binding OpenAvaniCommand}" Classes="Primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontSize="20" Padding="20"/>
+                
+                <Button Content="HARDIKA CREATION" Command="{Binding OpenHardikaCommand}" Classes="Primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontSize="20" Padding="20"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

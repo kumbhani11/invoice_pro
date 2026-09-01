@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>InvoicePro</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.1.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
+    <PackageReference Include="QuestPDF" Version="2026.8.0" />
+  </ItemGroup>
+</Project>

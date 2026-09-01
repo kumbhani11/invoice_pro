@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.Settings"
+             x:DataType="vm:SettingsViewModel"
+             x:Class="InvoicePro.UI.Settings.SettingsView">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,30">
+            <TextBlock Grid.Column="0" Text="COMPANY SETTINGS" Classes="PageTitle"/>
+            <Button Grid.Column="2" Content="BACK TO DASHBOARD" Command="{Binding GoToDashboardCommand}" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Form -->
+        <Border Grid.Row="1" Classes="Card" VerticalAlignment="Top" HorizontalAlignment="Left" Width="600">
+            <StackPanel Spacing="15">
+                <TextBlock Text="These details will appear on your printed invoices." FontSize="14" Foreground="{DynamicResource AppMutedTextColor}" Margin="0,0,0,10"/>
+                
+                <TextBlock Text="Company Name *" FontWeight="Bold"/>
+                <TextBox Text="{Binding CurrentCompany.Name}"/>
+                
+                <TextBlock Text="GSTIN / Tax ID" FontWeight="Bold"/>
+                <TextBox Text="{Binding CurrentCompany.GSTIN}"/>
+                
+                <TextBlock Text="Phone Number" FontWeight="Bold"/>
+                <TextBox Text="{Binding CurrentCompany.Phone}"/>
+                
+                <TextBlock Text="Email Address" FontWeight="Bold"/>
+                <TextBox Text="{Binding CurrentCompany.Email}"/>
+                
+                <TextBlock Text="Registered Office Address" FontWeight="Bold"/>
+                <TextBox Text="{Binding CurrentCompany.RegisteredOffice}" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+                
+                <TextBlock Text="Invoice Terms &amp; Conditions" FontWeight="Bold"/>
+                <TextBox Text="{Binding CurrentCompany.TermsAndConditions}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" Watermark="e.g. 1. Goods once sold will not be taken back."/>
+                
+                <StackPanel Orientation="Horizontal" Spacing="15" Margin="0,20,0,0">
+                    <Button Content="SAVE SETTINGS" Command="{Binding SaveSettingsCommand}" Classes="Success" FontSize="18" Padding="30,10"/>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource AppSuccessColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

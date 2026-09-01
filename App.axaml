@@ -1,0 +1,83 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="InvoicePro.App"
+             xmlns:local="using:InvoicePro"
+             RequestedThemeVariant="Light">
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="AppPrimaryColor">#0078D7</SolidColorBrush>
+        <SolidColorBrush x:Key="AppPrimaryHoverColor">#005A9E</SolidColorBrush>
+        <SolidColorBrush x:Key="AppBackgroundColor">#F3F3F3</SolidColorBrush>
+        <SolidColorBrush x:Key="AppPanelColor">#FFFFFF</SolidColorBrush>
+        <SolidColorBrush x:Key="AppBorderColor">#CCCCCC</SolidColorBrush>
+        <SolidColorBrush x:Key="AppTextColor">#333333</SolidColorBrush>
+        <SolidColorBrush x:Key="AppMutedTextColor">#666666</SolidColorBrush>
+        <SolidColorBrush x:Key="AppDangerColor">#D13438</SolidColorBrush>
+        <SolidColorBrush x:Key="AppDangerHoverColor">#A80000</SolidColorBrush>
+        <SolidColorBrush x:Key="AppSuccessColor">#107C10</SolidColorBrush>
+        
+        <CornerRadius x:Key="AppCornerRadius">4</CornerRadius>
+    </Application.Resources>
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        
+        <!-- Standard Button Default Settings -->
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="{DynamicResource AppCornerRadius}"/>
+            <Setter Property="Padding" Value="15,8"/>
+        </Style>
+
+        <!-- Primary Button -->
+        <Style Selector="Button.Primary">
+            <Setter Property="Background" Value="{DynamicResource AppPrimaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button.Primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppPrimaryHoverColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <!-- Success Button -->
+        <Style Selector="Button.Success">
+            <Setter Property="Background" Value="{DynamicResource AppSuccessColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Danger Button -->
+        <Style Selector="Button.Danger">
+            <Setter Property="Background" Value="{DynamicResource AppDangerColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button.Danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppDangerHoverColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Container Panels -->
+        <Style Selector="Border.Card">
+            <Setter Property="Background" Value="{DynamicResource AppPanelColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="{DynamicResource AppCornerRadius}"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="BoxShadow" Value="0 2 5 0 #1A000000"/>
+        </Style>
+        
+        <!-- Text Styles -->
+        <Style Selector="TextBlock.PageTitle">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppPrimaryColor}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Application.Styles>
+</Application>

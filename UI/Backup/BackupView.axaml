@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.Backup"
+             x:DataType="vm:BackupViewModel"
+             x:Class="InvoicePro.UI.Backup.BackupView">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,30">
+            <TextBlock Grid.Column="0" Text="DATABASE BACKUP &amp; RESTORE" Classes="PageTitle"/>
+            <Button Grid.Column="2" Content="BACK TO DASHBOARD" Command="{Binding GoToDashboardCommand}" VerticalAlignment="Center"/>
+        </Grid>
+
+        <Border Grid.Row="1" Classes="Card" VerticalAlignment="Top" HorizontalAlignment="Left" Width="600">
+            <StackPanel Spacing="30">
+                <TextBlock Text="Protect your data by regularly backing up your database." FontSize="16"/>
+                
+                <StackPanel Spacing="10">
+                    <Button Content="BACKUP DATABASE" Click="OnBackupClicked" Classes="Primary" FontSize="18" Padding="20,10"/>
+                    <TextBlock Text="Creates a copy of your billing data to a secure location." FontSize="12" Foreground="{DynamicResource AppMutedTextColor}"/>
+                </StackPanel>
+                
+                <Rectangle Height="1" Fill="{DynamicResource AppBorderColor}"/>
+                
+                <StackPanel Spacing="10">
+                    <Button Content="RESTORE DATABASE" Click="OnRestoreClicked" Classes="Danger" FontSize="18" Padding="20,10"/>
+                    <TextBlock Text="WARNING: Restoring will overwrite all current data. You MUST restart the app afterwards." FontSize="12" Foreground="{DynamicResource AppMutedTextColor}"/>
+                </StackPanel>
+                
+                <TextBlock x:Name="StatusText" FontWeight="Bold" Margin="0,20,0,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
