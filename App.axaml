@@ -1,83 +1,128 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="InvoicePro.App"
-             xmlns:local="using:InvoicePro"
              RequestedThemeVariant="Light">
 
     <Application.Resources>
-        <SolidColorBrush x:Key="AppPrimaryColor">#0078D7</SolidColorBrush>
-        <SolidColorBrush x:Key="AppPrimaryHoverColor">#005A9E</SolidColorBrush>
-        <SolidColorBrush x:Key="AppBackgroundColor">#F3F3F3</SolidColorBrush>
-        <SolidColorBrush x:Key="AppPanelColor">#FFFFFF</SolidColorBrush>
-        <SolidColorBrush x:Key="AppBorderColor">#CCCCCC</SolidColorBrush>
-        <SolidColorBrush x:Key="AppTextColor">#333333</SolidColorBrush>
-        <SolidColorBrush x:Key="AppMutedTextColor">#666666</SolidColorBrush>
-        <SolidColorBrush x:Key="AppDangerColor">#D13438</SolidColorBrush>
-        <SolidColorBrush x:Key="AppDangerHoverColor">#A80000</SolidColorBrush>
-        <SolidColorBrush x:Key="AppSuccessColor">#107C10</SolidColorBrush>
+        <!-- Windows Classic Color Palette -->
+        <Color x:Key="WinBgColor">#F0F0F0</Color>
+        <Color x:Key="WinPanelColor">#F5F6F7</Color>
+        <Color x:Key="WinBorderColor">#808080</Color>
+        <Color x:Key="WinBorderLightColor">#ABABAB</Color>
+        <Color x:Key="WinInputBorderColor">#7F9DB9</Color>
+        <Color x:Key="WinHighlightColor">#0078D7</Color>
         
-        <CornerRadius x:Key="AppCornerRadius">4</CornerRadius>
-    </Application.Resources>
+        <SolidColorBrush x:Key="WinBg" Color="{StaticResource WinBgColor}"/>
+        <SolidColorBrush x:Key="WinPanel" Color="{StaticResource WinPanelColor}"/>
+        <SolidColorBrush x:Key="WinBorder" Color="{StaticResource WinBorderColor}"/>
+        <SolidColorBrush x:Key="WinBorderLight" Color="{StaticResource WinBorderLightColor}"/>
+        <SolidColorBrush x:Key="WinInputBorder" Color="{StaticResource WinInputBorderColor}"/>
+        <SolidColorBrush x:Key="WinHighlight" Color="{StaticResource WinHighlightColor}"/>
 
-    <Application.DataTemplates>
-        <local:ViewLocator />
-    </Application.DataTemplates>
+        <!-- Typography -->
+        <FontFamily x:Key="WinFontUI">Segoe UI, Tahoma, Arial, sans-serif</FontFamily>
+        <FontFamily x:Key="WinFontMono">Consolas, Courier New, monospace</FontFamily>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
-        
-        <!-- Standard Button Default Settings -->
+
+        <!-- Global Base Overrides -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <!-- WinForms/Notepad++ Style Button -->
         <Style Selector="Button">
-            <Setter Property="CornerRadius" Value="{DynamicResource AppCornerRadius}"/>
-            <Setter Property="Padding" Value="15,8"/>
-        </Style>
-
-        <!-- Primary Button -->
-        <Style Selector="Button.Primary">
-            <Setter Property="Background" Value="{DynamicResource AppPrimaryColor}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-        <Style Selector="Button.Primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource AppPrimaryHoverColor}"/>
-            <Setter Property="Foreground" Value="White"/>
-        </Style>
-        
-        <!-- Success Button -->
-        <Style Selector="Button.Success">
-            <Setter Property="Background" Value="{DynamicResource AppSuccessColor}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-
-        <!-- Danger Button -->
-        <Style Selector="Button.Danger">
-            <Setter Property="Background" Value="{DynamicResource AppDangerColor}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-        <Style Selector="Button.Danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource AppDangerHoverColor}"/>
-            <Setter Property="Foreground" Value="White"/>
-        </Style>
-
-        <!-- Container Panels -->
-        <Style Selector="Border.Card">
-            <Setter Property="Background" Value="{DynamicResource AppPanelColor}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderColor}"/>
+            <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="12,2"/>
+            <Setter Property="CornerRadius" Value="1"/>
+            <Setter Property="Background" Value="#E1E1E1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WinBorderLight}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="{DynamicResource AppCornerRadius}"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="BoxShadow" Value="0 2 5 0 #1A000000"/>
         </Style>
-        
-        <!-- Text Styles -->
-        <Style Selector="TextBlock.PageTitle">
-            <Setter Property="FontSize" Value="28"/>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E5F1FB"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#CCE4F7"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
+        </Style>
+
+        <!-- WinForms Classic TextBox -->
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WinInputBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Toolbar Button Style -->
+        <Style Selector="Button.toolbar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="2"/>
+            <Setter Property="CornerRadius" Value="1"/>
+        </Style>
+        <Style Selector="Button.toolbar:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#CEE5FC"/>
+            <Setter Property="BorderBrush" Value="#69A5E0"/>
+        </Style>
+
+        <!-- TabControl: Rectangular Classic Tabs -->
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Margin" Value="0,0,-1,0"/>
+            <Setter Property="Padding" Value="10,2"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="BorderThickness" Value="1,1,1,0"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WinBorderLight}"/>
+            <Setter Property="Background" Value="#E1E1E1"/>
+        </Style>
+        <Style Selector="TabItem:selected">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WinBorder}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppPrimaryColor}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Classic Compact DataGrid Gridlines & Cells -->
+        <Style Selector="DataGrid">
+            <Setter Property="GridLinesVisibility" Value="All"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#D4D4D4"/>
+            <Setter Property="VerticalGridLinesBrush" Value="#D4D4D4"/>
+            <Setter Property="RowHeight" Value="26"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#E4E4E4"/>
+            <Setter Property="BorderBrush" Value="#C0C0C0"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Height" Value="26"/>
+        </Style>
+        <Style Selector="DataGridRow:nth-child(even)">
+            <Setter Property="Background" Value="#F9F9F9"/>
+        </Style>
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="{StaticResource WinHighlight}"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
         </Style>
     </Application.Styles>
 </Application>
