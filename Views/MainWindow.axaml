@@ -32,6 +32,9 @@
                 <Border Classes="tab" Classes.tabActive="{Binding IsReportsActive}">
                     <Button Classes="tabBtn" Content="Reports" Command="{Binding ReportsCommand}"/>
                 </Border>
+                <Border Classes="tab" Classes.tabActive="{Binding IsCompanyActive}">
+                    <Button Classes="tabBtn" Content="Company" Command="{Binding CompanyCommand}"/>
+                </Border>
             </StackPanel>
         </Border>
 

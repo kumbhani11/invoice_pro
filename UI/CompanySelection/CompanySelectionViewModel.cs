@@ -47,13 +47,15 @@ public partial class CompanySelectionViewModel : ViewModelBase
         {
             db.Database.Migrate();
 
-            if (isNew)
+            var company = await db.Companies.FirstOrDefaultAsync();
+            if (company == null)
             {
-                db.Companies.Add(new Company { Name = companyName });
+                company = new Company { Name = companyName };
+                db.Companies.Add(company);
                 await db.SaveChangesAsync();
             }
 
-            SessionContext.CurrentCompany = await db.Companies.FirstOrDefaultAsync();
+            SessionContext.CurrentCompany = company;
         }
 
         var mainVm = new MainViewModel(companyName);

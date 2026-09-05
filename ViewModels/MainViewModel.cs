@@ -25,6 +25,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private bool _isCustomersActive;
     [ObservableProperty] private bool _isProductsActive;
     [ObservableProperty] private bool _isReportsActive;
+    [ObservableProperty] private bool _isCompanyActive;
 
     public MainViewModel(string companyName = "AVANI ENTERPRISE")
     {
@@ -47,6 +48,7 @@ public partial class MainViewModel : ViewModelBase
         IsCustomersActive = page is CustomersViewModel;
         IsProductsActive  = page is ProductsViewModel;
         IsReportsActive   = page is ReportsViewModel;
+        IsCompanyActive   = page is SettingsViewModel;
     }
 
     [RelayCommand] private void NewBill()   => Navigate(new NewBillViewModel(_selectedCompanyName));
@@ -54,6 +56,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand] private void Customers() => Navigate(new CustomersViewModel());
     [RelayCommand] private void Products()  => Navigate(new ProductsViewModel());
     [RelayCommand] private void Reports()   => Navigate(new ReportsViewModel());
+    [RelayCommand] private void Company()   => Navigate(new SettingsViewModel());
     [RelayCommand] private void Backup()    => Navigate(new BackupViewModel());
     [RelayCommand] private void Settings()  => Navigate(new SettingsViewModel());
     [RelayCommand] private void Exit()      => Environment.Exit(0);

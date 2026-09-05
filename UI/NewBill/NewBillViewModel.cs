@@ -19,10 +19,18 @@ namespace InvoicePro.UI.NewBill;
 
 public partial class NewBillViewModel : ViewModelBase
 {
+    private readonly string _defaultCompanyName;
     private decimal _cgst, _sgst, _roundOff;
 
     // ── Company & Customer ────────────────────────────────────────────────
     [ObservableProperty] private CompanyProfile _selectedCompany = new();
+    [ObservableProperty] private string _companyName     = string.Empty;
+    [ObservableProperty] private string _companyAddress1 = string.Empty;
+    [ObservableProperty] private string _companyAddress2 = string.Empty;
+    [ObservableProperty] private string _companyPhone    = string.Empty;
+    [ObservableProperty] private string _companyGstin    = string.Empty;
+    [ObservableProperty] private string _companyState    = string.Empty;
+    [ObservableProperty] private string _companyStateCode = string.Empty;
     [ObservableProperty] private ObservableCollection<CustomerModel> _customers = new();
     [ObservableProperty] private CustomerModel? _selectedCustomer;
 
@@ -73,10 +81,65 @@ public partial class NewBillViewModel : ViewModelBase
 
     public NewBillViewModel(string selectedCompanyName)
     {
+        _defaultCompanyName = selectedCompanyName;
         SelectedCompany = DummyDataStore.GetCompanyProfile(selectedCompanyName);
         PreviewCompanyName = SelectedCompany.CompanyName;
         Customers = new ObservableCollection<CustomerModel>(DummyDataStore.Customers);
         InvoiceItems.CollectionChanged += OnCollectionChanged;
+        _ = LoadCompanyFromDbAsync();
+    }
+
+    private async Task LoadCompanyFromDbAsync()
+    {
+        try
+        {
+            Company? company = SessionContext.CurrentCompany;
+
+            if (company == null)
+            {
+                using var db = new BillingDbContext();
+                company = await db.Companies.FirstOrDefaultAsync();
+                if (company != null)
+                    SessionContext.CurrentCompany = company;
+            }
+
+            if (company != null)
+            {
+                CompanyName      = company.Name;
+                CompanyAddress1  = company.RegisteredOffice;
+                CompanyAddress2  = company.SalesOffice;
+                CompanyPhone     = company.Phone;
+                CompanyGstin     = company.GSTIN;
+                CompanyState     = company.State;
+                CompanyStateCode = company.StateCode;
+                PreviewCompanyName = company.Name;
+
+                SelectedCompany = new CompanyProfile
+                {
+                    Id            = company.Id,
+                    CompanyName   = company.Name,
+                    AddressLine1  = company.RegisteredOffice,
+                    AddressLine2  = company.SalesOffice,
+                    Contact       = company.Phone,
+                    GSTIN         = company.GSTIN,
+                    BankName      = company.BankName,
+                    BankBranch    = company.BankBranch,
+                    BankAccountNo = company.BankAccount,
+                    BankIFSC      = company.IFSC
+                };
+                return;
+            }
+
+            CompanyName      = SelectedCompany.CompanyName;
+            CompanyAddress1  = SelectedCompany.AddressLine1;
+            CompanyAddress2  = SelectedCompany.AddressLine2;
+            CompanyPhone     = SelectedCompany.Contact;
+            CompanyGstin     = SelectedCompany.GSTIN;
+            CompanyState     = string.Empty;
+            CompanyStateCode = string.Empty;
+            PreviewCompanyName = SelectedCompany.CompanyName;
+        }
+        catch { /* fall back to DummyDataStore values already set */ }
     }
 
     // ── Auto-fill when customer is selected ───────────────────────────────

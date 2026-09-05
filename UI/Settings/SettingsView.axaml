@@ -43,6 +43,16 @@
                     <TextBox Text="{Binding CurrentCompany.RegisteredOffice}"
                              Height="52" AcceptsReturn="True" TextWrapping="Wrap"/>
 
+                    <TextBlock Text="Sales Office Address" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                    <TextBox Text="{Binding CurrentCompany.SalesOffice}"
+                             Height="52" AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                    <TextBlock Text="State" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                    <TextBox Text="{Binding CurrentCompany.State}"/>
+
+                    <TextBlock Text="State Code" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                    <TextBox Text="{Binding CurrentCompany.StateCode}"/>
+
                     <TextBlock Text="Terms &amp; Conditions" FontWeight="SemiBold" Margin="0,6,0,0"/>
                     <TextBox Text="{Binding CurrentCompany.TermsAndConditions}"
                              Height="64" AcceptsReturn="True" TextWrapping="Wrap"
