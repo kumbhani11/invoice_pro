@@ -95,45 +95,6 @@
             <Setter Property="Background" Value="#A02315"/>
         </Style>
 
-        <!-- ── Menu Bar Button ── -->
-        <Style Selector="Button.menubar">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="BorderBrush"     Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Height"          Value="22"/>
-            <Setter Property="Padding"         Value="8,1"/>
-            <Setter Property="CornerRadius"    Value="0"/>
-            <Setter Property="FontSize"        Value="12"/>
-        </Style>
-        <Style Selector="Button.menubar:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#D0E8F8"/>
-            <Setter Property="BorderBrush" Value="#7EB4EA"/>
-        </Style>
-        <Style Selector="Button.menubar:pressed /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#B8D8F0"/>
-            <Setter Property="BorderBrush" Value="#569DE5"/>
-        </Style>
-
-        <!-- ── Toolbar Button ── -->
-        <Style Selector="Button.toolbar">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="BorderBrush"     Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Width"           Value="26"/>
-            <Setter Property="Height"          Value="26"/>
-            <Setter Property="Padding"         Value="2"/>
-            <Setter Property="CornerRadius"    Value="1"/>
-            <Setter Property="FontSize"        Value="14"/>
-        </Style>
-        <Style Selector="Button.toolbar:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#CEE5FC"/>
-            <Setter Property="BorderBrush" Value="#69A5E0"/>
-        </Style>
-        <Style Selector="Button.toolbar:pressed /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#B8D8F0"/>
-            <Setter Property="BorderBrush" Value="#569DE5"/>
-        </Style>
-
         <!-- ── Tab Border ── -->
         <Style Selector="Border.tab">
             <Setter Property="Background"      Value="#D8D8D8"/>

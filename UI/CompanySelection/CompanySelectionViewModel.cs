@@ -8,7 +8,6 @@ using InvoicePro.Models;
 using InvoicePro.Services;
 using InvoicePro.ViewModels;
 using InvoicePro.Views;
-using InvoicePro.UI.Dashboard;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoicePro.UI.CompanySelection;
@@ -57,10 +56,9 @@ public partial class CompanySelectionViewModel : ViewModelBase
             SessionContext.CurrentCompany = await db.Companies.FirstOrDefaultAsync();
         }
 
-        var mainVm = new MainViewModel();
+        var mainVm = new MainViewModel(companyName);
         NavigationService.SetCompany?.Invoke(SessionContext.CurrentCompany?.Name ?? companyName);
         NavigationService.SetStatus?.Invoke("Ready");
-        NavigationService.NavigateTo?.Invoke(new DashboardViewModel());
 
         var mainWindow = new MainWindow { DataContext = mainVm };
         mainWindow.Show();

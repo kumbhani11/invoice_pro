@@ -1,0 +1,501 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.UI.NewBill"
+             x:Class="InvoicePro.UI.NewBill.InvoicePreviewView"
+             x:DataType="vm:NewBillViewModel"
+             Width="794"
+             Background="White"
+             FontFamily="Arial, sans-serif"
+             FontSize="9">
+
+  <!-- Outer invoice box — 1.5px solid black border matching .invoice-box -->
+  <Border BorderBrush="Black" BorderThickness="1.5" Padding="6" Background="White">
+    <StackPanel Orientation="Vertical" Spacing="0">
+
+      <!-- ═══ SECTION 1: TAX INVOICE title row ═══ -->
+      <Grid ColumnDefinitions="120,*,130" Margin="0,0,0,4">
+        <TextBlock Grid.Column="0" Text="" />
+        <TextBlock Grid.Column="1"
+                   Text="TAX INVOICE"
+                   FontSize="16" FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"/>
+        <TextBlock Grid.Column="2"
+                   Text="Original for Recepient"
+                   FontSize="11" FontWeight="Bold"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"/>
+      </Grid>
+
+      <!-- ═══ SECTION 2: Company info (60%) | Invoice meta (40%) ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1">
+        <Grid ColumnDefinitions="3*,2*">
+
+          <!-- Left 60%: Company details -->
+          <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="4">
+            <StackPanel Spacing="1">
+              <TextBlock Text="{Binding CompanyProfile.CompanyName}"
+                         FontSize="14" FontWeight="Bold"/>
+              <TextBlock Text="{Binding CompanyProfile.AddressLine1}"
+                         FontSize="8" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding CompanyProfile.AddressLine2}"
+                         FontSize="8" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding CompanyProfile.Contact}" FontSize="8"/>
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <TextBlock Text="GSTIN:" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding CompanyProfile.GSTIN}" FontWeight="Bold" FontSize="8"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Right 40%: Invoice meta key-value pairs -->
+          <Border Grid.Column="1" Padding="6,4">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
+              <TextBlock Grid.Row="0" Grid.Column="0" Text="INVOICE NO.:" FontWeight="Bold" Margin="0,1"/>
+              <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding InvoiceNumber}"
+                         FontWeight="Bold" FontSize="13" HorizontalAlignment="Right" Margin="0,1"/>
+              <TextBlock Grid.Row="1" Grid.Column="0" Text="DATE" FontWeight="Bold" Margin="0,1"/>
+              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding InvoiceDate, StringFormat=': {0:dd/MM/yyyy}'}"
+                         FontWeight="Bold" HorizontalAlignment="Right" Margin="0,1"/>
+              <TextBlock Grid.Row="2" Grid.Column="0" Text="State" FontWeight="Bold" Margin="0,1"/>
+              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedCustomer.State, StringFormat=': {0}'}"
+                         FontWeight="Bold" HorizontalAlignment="Right" Margin="0,1"/>
+              <TextBlock Grid.Row="3" Grid.Column="0" Text="State Code" FontWeight="Bold" Margin="0,1"/>
+              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedCustomer.StateCode, StringFormat=': {0}'}"
+                         FontWeight="Bold" HorizontalAlignment="Right" Margin="0,1"/>
+            </Grid>
+          </Border>
+
+        </Grid>
+      </Border>
+
+      <!-- ═══ SECTION 3: Bill to Party | Supply to Party ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,1">
+        <Grid ColumnDefinitions="*,*">
+
+          <!-- Left: Bill to party — dashed right border -->
+          <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0"
+                  Padding="5">
+            <StackPanel Spacing="2">
+              <StackPanel Orientation="Horizontal" Spacing="3">
+                <TextBlock Text="Bill to party:" FontWeight="Bold"/>
+                <TextBlock Text="{Binding SelectedCustomer.Name}" FontWeight="Bold" FontSize="11"/>
+              </StackPanel>
+              <TextBlock Text="{Binding SelectedCustomer.Address}"
+                         Margin="70,0,0,0" TextWrapping="Wrap" FontSize="8"/>
+              <StackPanel Margin="0,6,0,0" Orientation="Horizontal" Spacing="2">
+                <TextBlock Text="GSTIN        :" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCustomer.GSTIN}" FontWeight="Bold" FontSize="8"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <TextBlock Text="State          :" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCustomer.State}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="   State Code:" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCustomer.StateCode}" FontWeight="Bold" FontSize="8"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Right: Supply to party -->
+          <Border Grid.Column="1" Padding="5">
+            <StackPanel Spacing="2">
+              <StackPanel Orientation="Horizontal" Spacing="3">
+                <TextBlock Text="Supply to party" FontWeight="Bold"/>
+                <TextBlock Text="{Binding SelectedCustomer.Name}" FontWeight="Bold" FontSize="11"/>
+              </StackPanel>
+              <TextBlock Text="{Binding SelectedCustomer.Address}"
+                         Margin="70,0,0,0" TextWrapping="Wrap" FontSize="8"/>
+              <StackPanel Margin="0,6,0,0" Orientation="Horizontal" Spacing="2">
+                <TextBlock Text="GSTIN      :" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCustomer.GSTIN}" FontWeight="Bold" FontSize="8"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <TextBlock Text="State        :" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCustomer.State}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="   State Code:" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCustomer.StateCode}" FontWeight="Bold" FontSize="8"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+        </Grid>
+      </Border>
+
+      <!-- ═══ SECTION 4: Transport / Dispatch row ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="4,3">
+        <Grid ColumnDefinitions="*,*,*,*">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2">
+            <TextBlock Text="Reverse Charge:" FontWeight="Bold" FontSize="8"/>
+            <TextBlock Text="{Binding PreviewReverseCharge}" FontSize="8"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
+            <TextBlock Text="Transport :" FontWeight="Bold" FontSize="8"/>
+            <TextBlock Text="{Binding PreviewTransport}" FontSize="8"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2">
+            <TextBlock Text="Date of Supply:" FontWeight="Bold" FontSize="8"/>
+            <TextBlock Text="{Binding PreviewDateOfSupply}" FontSize="8"/>
+          </StackPanel>
+          <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2"
+                      HorizontalAlignment="Right">
+            <TextBlock Text="Place of Supply:" FontWeight="Bold" FontSize="8"/>
+            <TextBlock Text="{Binding PreviewPlaceOfSupply}" FontSize="8"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ═══ SECTION 5: Product table ═══ -->
+      <!-- Column widths mirror HTML percentages scaled to 782px usable width -->
+      <!-- S.No=5% Desc=27% FIT=12% SIZE=9% HSN=7% QTY=6% UOM=6% Rate=10% AMT=18% -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,0">
+
+        <!-- Header row -->
+        <Grid ColumnDefinitions="39,211,94,70,55,47,47,78,141">
+          <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="S.&#10;No." FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center" TextAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="Product Discription" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="FIT" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="SIZE" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="HSN" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="QTY" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="UOM" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+            <TextBlock Text="Rate" FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="8" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2">
+            <TextBlock Text="AMOUNT RS." FontWeight="Bold" FontSize="8"
+                       HorizontalAlignment="Center"/>
+          </Border>
+        </Grid>
+
+      </Border>
+
+      <!-- Product rows via ItemsControl -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,0">
+        <ItemsControl ItemsSource="{Binding InvoiceItems}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="39,211,94,70,55,47,47,78,141" MinHeight="18">
+                <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="{Binding ItemIndex}" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="{Binding Description}" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="{Binding ProductCode}" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="{Binding HSN}" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="{Binding Quantity}" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="Pcs" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                  <TextBlock Text="{Binding Rate, StringFormat='{}{0:F2}'}" HorizontalAlignment="Center" FontSize="8"/>
+                </Border>
+                <Border Grid.Column="8" BorderBrush="Black" BorderThickness="0,0,0,0" Padding="2">
+                  <TextBlock Text="{Binding Amount, StringFormat='{}{0:F2}'}"
+                             HorizontalAlignment="Right" FontSize="8"/>
+                </Border>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Border>
+
+      <!-- Spacer row — minimum 150px height filler to keep table tall -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,0" MinHeight="150">
+        <Grid ColumnDefinitions="39,211,94,70,55,47,47,78,141">
+          <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="8"/>
+        </Grid>
+      </Border>
+
+      <!-- Total row -->
+      <Border BorderBrush="Black" BorderThickness="1,1,1,1">
+        <Grid ColumnDefinitions="39,211,94,70,55,47,47,78,141">
+          <!-- colspan 5 = columns 0-4 -->
+          <Border Grid.Column="0" Grid.ColumnSpan="5"
+                  BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+            <TextBlock Text="Total" FontWeight="Bold" FontSize="12"
+                       HorizontalAlignment="Center"/>
+          </Border>
+          <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+            <TextBlock Text="{Binding TotalQuantity}" FontWeight="Bold"
+                       HorizontalAlignment="Center" FontSize="8"/>
+          </Border>
+          <!-- colspan 2 = columns 6-7 -->
+          <Border Grid.Column="6" Grid.ColumnSpan="2"
+                  BorderBrush="Black" BorderThickness="0,0,1,0"/>
+          <Border Grid.Column="8" Padding="2">
+            <TextBlock Text="{Binding SubTotal, StringFormat='{}{0:F2}'}" FontWeight="Bold"
+                       HorizontalAlignment="Right" FontSize="8"/>
+          </Border>
+        </Grid>
+      </Border>
+
+      <!-- ═══ SECTION 6: Calculations — 63% tax breakup | 37% net amounts ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,1">
+        <Grid ColumnDefinitions="493,289">
+
+          <!-- Left 63%: Tax breakup table -->
+          <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="4">
+            <StackPanel Spacing="0">
+
+              <!-- Tax table header row 1: TAX HEAD | CGST (span2) | SGST (span2) | IGST (span2) -->
+              <Border BorderBrush="Black" BorderThickness="1">
+                <Grid ColumnDefinitions="80,60,80,60,80,60,80">
+                  <Border Grid.Column="0" Grid.RowSpan="1"
+                          BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="TAX HEAD" FontWeight="Bold" FontSize="7"
+                               HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="1" Grid.ColumnSpan="2"
+                          BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="CGST" FontWeight="Bold" FontSize="7"
+                               HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="3" Grid.ColumnSpan="2"
+                          BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="SGST" FontWeight="Bold" FontSize="7"
+                               HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="5" Grid.ColumnSpan="2"
+                          BorderBrush="Black" BorderThickness="0,0,0,0" Padding="2">
+                    <TextBlock Text="IGST" FontWeight="Bold" FontSize="7"
+                               HorizontalAlignment="Center"/>
+                  </Border>
+                </Grid>
+              </Border>
+
+              <!-- Tax table header row 2: empty | % | Amount | % | Amount | % | Amount -->
+              <Border BorderBrush="Black" BorderThickness="1,0,1,1">
+                <Grid ColumnDefinitions="80,60,80,60,80,60,80">
+                  <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="" FontSize="7"/>
+                  </Border>
+                  <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="%" FontWeight="Bold" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="Amount" FontWeight="Bold" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="%" FontWeight="Bold" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="Amount" FontWeight="Bold" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="%" FontWeight="Bold" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="6" Padding="2">
+                    <TextBlock Text="Amount" FontWeight="Bold" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                </Grid>
+              </Border>
+
+              <!-- Tax data row: G.S.T 5% -->
+              <Border BorderBrush="Black" BorderThickness="1,0,1,1">
+                <Grid ColumnDefinitions="80,60,80,60,80,60,80">
+                  <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="G.S.T 5%" FontWeight="Bold" FontSize="7"/>
+                  </Border>
+                  <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="{Binding PreviewCgstRate}" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="{Binding PreviewCgstAmount}" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="{Binding PreviewSgstRate}" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="{Binding PreviewSgstAmount}" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                    <TextBlock Text="{Binding PreviewIgstRate}" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                  <Border Grid.Column="6" Padding="2">
+                    <TextBlock Text="{Binding PreviewIgstAmount}" FontSize="7" HorizontalAlignment="Center"/>
+                  </Border>
+                </Grid>
+              </Border>
+
+            </StackPanel>
+          </Border>
+
+          <!-- Right 37%: Net amounts -->
+          <Border Grid.Column="1">
+            <StackPanel Spacing="0">
+              <!-- Discount -->
+              <Border BorderBrush="Black" BorderThickness="0,0,0,1" Padding="3,2">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="Discount" FontSize="8"/>
+                  <TextBlock Grid.Column="1" Text="{Binding DiscountAmount, StringFormat='{}{0:F2}'}"
+                             FontSize="8" HorizontalAlignment="Right" MinWidth="70" TextAlignment="Right"/>
+                </Grid>
+              </Border>
+              <!-- Taxable Amount -->
+              <Border BorderBrush="Black" BorderThickness="0,0,0,1" Padding="3,2">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="Taxable Amount" FontSize="8"/>
+                  <TextBlock Grid.Column="1" Text="{Binding TaxableAmount, StringFormat='{}{0:F2}'}"
+                             FontSize="8" HorizontalAlignment="Right" MinWidth="70" TextAlignment="Right"/>
+                </Grid>
+              </Border>
+              <!-- GST % -->
+              <Border BorderBrush="Black" BorderThickness="0,0,0,1" Padding="3,2">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="{Binding PreviewGstLabel}" FontSize="8"/>
+                  <TextBlock Grid.Column="1" Text="{Binding TaxTotal, StringFormat='{}{0:F2}'}"
+                             FontSize="8" HorizontalAlignment="Right" MinWidth="70" TextAlignment="Right"/>
+                </Grid>
+              </Border>
+              <!-- Round Off -->
+              <Border BorderBrush="Black" BorderThickness="0,0,0,1" Padding="3,2">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="Round Off" FontSize="8"/>
+                  <TextBlock Grid.Column="1" Text="{Binding RoundOffAmount, StringFormat='{}{0:F2}'}"
+                             FontSize="8" HorizontalAlignment="Right" MinWidth="70" TextAlignment="Right"/>
+                </Grid>
+              </Border>
+              <!-- NET AMOUNT -->
+              <Border Padding="3,2">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="NET AMOUNT (Rs.)" FontWeight="Bold" FontSize="8"/>
+                  <TextBlock Grid.Column="1" Text="{Binding GrandTotal, StringFormat='{}{0:F2}'}"
+                             FontWeight="Bold" FontSize="11"
+                             HorizontalAlignment="Right" MinWidth="70" TextAlignment="Right"/>
+                </Grid>
+              </Border>
+            </StackPanel>
+          </Border>
+
+        </Grid>
+      </Border>
+
+      <!-- ═══ SECTION 7: Amount in words ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="4,3">
+        <StackPanel Orientation="Horizontal" Spacing="3">
+          <TextBlock Text="Rupees in words :" FontWeight="Bold" FontSize="8"/>
+          <TextBlock Text="{Binding PreviewAmountInWords}" FontSize="8" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ═══ SECTION 8: Bank details (left) | Authorised Signatory (right) ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,1">
+        <Grid ColumnDefinitions="*,220">
+
+          <!-- Left: Bank details + T&C -->
+          <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="4">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Bank Details" FontWeight="Bold" TextDecorations="Underline" FontSize="8"/>
+              <!-- Bank name + branch -->
+              <Grid ColumnDefinitions="65,*,*" Margin="0,2,0,0">
+                <TextBlock Grid.Column="0" Text="Bank Name :" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="1" Text="{Binding CompanyProfile.BankName}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="2" FontWeight="Bold" FontSize="8">
+                  <TextBlock.Text>
+                    <MultiBinding StringFormat="Branch : {0}">
+                      <Binding Path="CompanyProfile.BankBranch"/>
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+              </Grid>
+              <!-- Account -->
+              <Grid ColumnDefinitions="65,*">
+                <TextBlock Grid.Column="0" Text="Bank A/C:" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="1" Text="{Binding CompanyProfile.BankAccountNo}" FontWeight="Bold" FontSize="8"/>
+              </Grid>
+              <!-- IFSC -->
+              <Grid ColumnDefinitions="65,*">
+                <TextBlock Grid.Column="0" Text="Bank IFSC:" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="1" Text="{Binding CompanyProfile.BankIFSC}" FontWeight="Bold" FontSize="8"/>
+              </Grid>
+              <!-- Terms -->
+              <TextBlock Text="Terms &amp; conditions :" FontWeight="Bold"
+                         TextDecorations="Underline" FontSize="8" Margin="0,6,0,0"/>
+              <TextBlock FontSize="7.5" TextWrapping="Wrap"
+                         Text="* Payment of will be accepted by Cross Cheque or Order Draft only.&#10;* Goods once sold will not be taken back.* Payment strictly within 30 days."/>
+            </StackPanel>
+          </Border>
+
+          <!-- Right: Authorised Signatory -->
+          <Border Grid.Column="1" Padding="4" MinHeight="110">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <!-- Top: certification text + company name -->
+              <StackPanel Grid.Row="0" HorizontalAlignment="Center" Spacing="1">
+                <TextBlock Text="Ceritified that the particulars given"
+                           FontSize="7.5" Foreground="#333333" HorizontalAlignment="Center"/>
+                <TextBlock Text="above are true and correct"
+                           FontSize="7.5" Foreground="#333333" HorizontalAlignment="Center"/>
+                <TextBlock FontSize="11" FontWeight="Bold"
+                           HorizontalAlignment="Center" Margin="0,4,0,0">
+                  <TextBlock.Text>
+                    <MultiBinding StringFormat="For {0}">
+                      <Binding Path="PreviewCompanyName"/>
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+              </StackPanel>
+              <!-- Middle: signature space -->
+              <Border Grid.Row="1" MinHeight="40"/>
+              <!-- Bottom: label -->
+              <TextBlock Grid.Row="2" Text="Authorised Signatory"
+                         FontWeight="Bold" FontSize="8"
+                         HorizontalAlignment="Center" Margin="0,0,0,4"/>
+            </Grid>
+          </Border>
+
+        </Grid>
+      </Border>
+
+      <!-- ═══ SECTION 9: Bottom footer bar ═══ -->
+      <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="4,3">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="Subject to Mumbai Juridiction"
+                     FontWeight="Bold" FontSize="8" HorizontalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Text="E. &amp; O.E."
+                     FontWeight="Bold" FontSize="8"/>
+        </Grid>
+      </Border>
+
+    </StackPanel>
+  </Border>
+</UserControl>

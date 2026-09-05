@@ -10,103 +10,13 @@
         FontFamily="{StaticResource WinFontUI}"
         FontSize="12">
 
-    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
-
-        <!-- ═══ MENU BAR ═══ -->
-        <Border Grid.Row="0" Background="#F0F0F0"
-                BorderBrush="#C0C0C0" BorderThickness="0,0,0,1"
-                Padding="2,1">
-            <StackPanel Orientation="Horizontal" Spacing="0">
-                <Button Classes="menubar" Content="File">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="New Invoice"      Command="{Binding NewBillCommand}"/>
-                            <MenuItem Header="-"/>
-                            <MenuItem Header="Exit"             Command="{Binding ExitCommand}"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <Button Classes="menubar" Content="Invoices">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="New Invoice"      Command="{Binding NewBillCommand}"/>
-                            <MenuItem Header="All Invoices"     Command="{Binding AllBillsCommand}"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <Button Classes="menubar" Content="Customers">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="Manage Customers" Command="{Binding CustomersCommand}"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <Button Classes="menubar" Content="Products">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="Manage Products"  Command="{Binding ProductsCommand}"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <Button Classes="menubar" Content="Reports">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="Sales Report"     Command="{Binding ReportsCommand}"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <Button Classes="menubar" Content="Tools">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="Backup / Restore" Command="{Binding BackupCommand}"/>
-                            <MenuItem Header="Company Settings" Command="{Binding SettingsCommand}"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <Button Classes="menubar" Content="Help">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem Header="About InvoicePro"/>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-            </StackPanel>
-        </Border>
-
-        <!-- ═══ ICON TOOLBAR ═══ -->
-        <Border Grid.Row="1" Background="#F5F5F5"
-                BorderBrush="#C0C0C0" BorderThickness="0,0,0,1"
-                Padding="3,2">
-            <StackPanel Orientation="Horizontal" Spacing="1">
-                <!-- Group: Navigation -->
-                <Button Classes="toolbar" ToolTip.Tip="Dashboard"    Command="{Binding DashboardCommand}">🏠</Button>
-                <!-- Divider -->
-                <Rectangle Width="1" Height="18" Fill="#C0C0C0" Margin="3,0"/>
-                <!-- Group: Invoice -->
-                <Button Classes="toolbar" ToolTip.Tip="New Invoice"  Command="{Binding NewBillCommand}">📄</Button>
-                <Button Classes="toolbar" ToolTip.Tip="All Invoices" Command="{Binding AllBillsCommand}">🗂</Button>
-                <!-- Divider -->
-                <Rectangle Width="1" Height="18" Fill="#C0C0C0" Margin="3,0"/>
-                <!-- Group: Master Data -->
-                <Button Classes="toolbar" ToolTip.Tip="Customers"    Command="{Binding CustomersCommand}">👥</Button>
-                <Button Classes="toolbar" ToolTip.Tip="Products"     Command="{Binding ProductsCommand}">📦</Button>
-                <!-- Divider -->
-                <Rectangle Width="1" Height="18" Fill="#C0C0C0" Margin="3,0"/>
-                <!-- Group: Reports & Tools -->
-                <Button Classes="toolbar" ToolTip.Tip="Reports"      Command="{Binding ReportsCommand}">📊</Button>
-                <Button Classes="toolbar" ToolTip.Tip="Backup"       Command="{Binding BackupCommand}">💾</Button>
-                <Button Classes="toolbar" ToolTip.Tip="Settings"     Command="{Binding SettingsCommand}">⚙</Button>
-            </StackPanel>
-        </Border>
+    <Grid RowDefinitions="Auto, *, Auto">
 
         <!-- ═══ TAB BAR ═══ -->
-        <Border Grid.Row="2" Background="#E4E4E4"
+        <Border Grid.Row="0" Background="#E4E4E4"
                 BorderBrush="#C0C0C0" BorderThickness="0,0,0,1"
                 Padding="4,0,0,0">
             <StackPanel Orientation="Horizontal" Spacing="0">
-                <Border Classes="tab" Classes.tabActive="{Binding IsDashboardActive}">
-                    <Button Classes="tabBtn" Content="Dashboard" Command="{Binding DashboardCommand}"/>
-                </Border>
                 <Border Classes="tab" Classes.tabActive="{Binding IsNewBillActive}">
                     <Button Classes="tabBtn" Content="New Invoice" Command="{Binding NewBillCommand}"/>
                 </Border>
@@ -126,10 +36,10 @@
         </Border>
 
         <!-- ═══ CONTENT AREA ═══ -->
-        <ContentControl Grid.Row="3" Content="{Binding CurrentPage}"/>
+        <ContentControl Grid.Row="1" Content="{Binding CurrentPage}"/>
 
         <!-- ═══ STATUS BAR ═══ -->
-        <Border Grid.Row="4" Background="#F0F0F0"
+        <Border Grid.Row="2" Background="#F0F0F0"
                 BorderBrush="#C0C0C0" BorderThickness="0,1,0,0"
                 Padding="0">
             <Grid ColumnDefinitions="*, Auto, Auto, Auto">
