@@ -58,6 +58,10 @@ namespace InvoicePro.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("GSTIN")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -286,6 +290,9 @@ namespace InvoicePro.Data.Migrations
 
                     b.Property<string>("Size")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TaxPercentage")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UOM")

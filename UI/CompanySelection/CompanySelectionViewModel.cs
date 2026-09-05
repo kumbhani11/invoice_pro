@@ -1,59 +1,69 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using InvoicePro.Data.SQLite;
 using InvoicePro.Models;
-using InvoicePro.UI.Dashboard;
+using InvoicePro.Services;
 using InvoicePro.ViewModels;
+using InvoicePro.Views;
+using InvoicePro.UI.Dashboard;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoicePro.UI.CompanySelection;
 
 public partial class CompanySelectionViewModel : ViewModelBase
 {
-    private string GetAppFolder()
+    private readonly Window _startupWindow;
+
+    public CompanySelectionViewModel(Window startupWindow)
     {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
+        _startupWindow = startupWindow;
+    }
+
+    private static string GetAppFolder()
+    {
+        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var appFolder = Path.Join(path, "InvoicePro");
         if (!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
         return appFolder;
     }
 
     [RelayCommand]
-    private async Task OpenAvaniAsync()
-    {
-        await OpenCompanyAsync("AVANI ENTERPRISE", "AVANI_ENTERPRISE.db");
-    }
+    private Task OpenAvaniAsync() => OpenCompanyAsync("AVANI ENTERPRISE", "AVANI_ENTERPRISE.db");
 
     [RelayCommand]
-    private async Task OpenHardikaAsync()
-    {
-        await OpenCompanyAsync("HARDIKA CREATION", "HARDIKA_CREATION.db");
-    }
+    private Task OpenHardikaAsync() => OpenCompanyAsync("HARDIKA CREATION", "HARDIKA_CREATION.db");
 
     private async Task OpenCompanyAsync(string companyName, string dbFileName)
     {
-        var folder = GetAppFolder();
-        var dbPath = Path.Join(folder, dbFileName);
-        
+        var dbPath = Path.Join(GetAppFolder(), dbFileName);
         bool isNew = !File.Exists(dbPath);
-        
+
         BillingDbContext.CurrentDatabasePath = dbPath;
+        SessionContext.CurrentDatabasePath = dbPath;
 
         using (var db = new BillingDbContext())
         {
             db.Database.Migrate();
-            
+
             if (isNew)
             {
                 db.Companies.Add(new Company { Name = companyName });
                 await db.SaveChangesAsync();
             }
+
+            SessionContext.CurrentCompany = await db.Companies.FirstOrDefaultAsync();
         }
 
+        var mainVm = new MainViewModel();
+        NavigationService.SetCompany?.Invoke(SessionContext.CurrentCompany?.Name ?? companyName);
+        NavigationService.SetStatus?.Invoke("Ready");
         NavigationService.NavigateTo?.Invoke(new DashboardViewModel());
+
+        var mainWindow = new MainWindow { DataContext = mainVm };
+        mainWindow.Show();
+        _startupWindow.Close();
     }
 }

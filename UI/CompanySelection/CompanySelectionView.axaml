@@ -1,20 +1,55 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:InvoicePro.UI.CompanySelection"
-             x:DataType="vm:CompanySelectionViewModel"
-             x:Class="InvoicePro.UI.CompanySelection.CompanySelectionView">
-    
-    <Grid Background="{DynamicResource AppBackgroundColor}">
-        <Border Classes="Card" HorizontalAlignment="Center" VerticalAlignment="Center" Width="500" Padding="40">
-            <StackPanel Spacing="30">
-                <TextBlock Text="INVOICE PRO" Classes="PageTitle" HorizontalAlignment="Center" FontSize="32" Margin="0,0,0,10"/>
-                
-                <TextBlock Text="Select Company to Continue" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center" Foreground="{DynamicResource AppMutedTextColor}"/>
-                
-                <Button Content="AVANI ENTERPRISE" Command="{Binding OpenAvaniCommand}" Classes="Primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontSize="20" Padding="20"/>
-                
-                <Button Content="HARDIKA CREATION" Command="{Binding OpenHardikaCommand}" Classes="Primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontSize="20" Padding="20"/>
-            </StackPanel>
-        </Border>
-    </Grid>
-</UserControl>
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InvoicePro.UI.CompanySelection"
+        x:DataType="vm:CompanySelectionViewModel"
+        x:Class="InvoicePro.UI.CompanySelection.CompanySelectionView"
+        Title="Billing Software - Startup"
+        Width="480"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Background="#F0F0F0"
+        FontFamily="Segoe UI, Tahoma, Arial, sans-serif"
+        FontSize="12">
+
+    <StackPanel Margin="20,16" Spacing="16">
+
+        <!-- Instruction label -->
+        <TextBlock Text="Select a company profile to load the database:"
+                   FontSize="13"
+                   Foreground="#333333"/>
+
+        <!-- Two company buttons side by side -->
+        <Grid ColumnDefinitions="*,12,*">
+
+            <Button Grid.Column="0"
+                    Command="{Binding OpenAvaniCommand}"
+                    Classes="companyBtn"
+                    HorizontalAlignment="Stretch">
+                <StackPanel HorizontalAlignment="Center" Spacing="8">
+                    <TextBlock Text="🏢" FontSize="28" Foreground="#0078D7" HorizontalAlignment="Center"/>
+                    <TextBlock Text="AVANI ENTERPRISE" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Grid.Column="2"
+                    Command="{Binding OpenHardikaCommand}"
+                    Classes="companyBtn"
+                    HorizontalAlignment="Stretch">
+                <StackPanel HorizontalAlignment="Center" Spacing="8">
+                    <TextBlock Text="🏭" FontSize="28" Foreground="#0078D7" HorizontalAlignment="Center"/>
+                    <TextBlock Text="HARDIKA CREATION" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </Grid>
+
+        <!-- Etched horizontal divider -->
+        <StackPanel Spacing="0" Margin="0,0,0,4">
+            <Rectangle Height="1" Fill="#A0A0A0"/>
+            <Rectangle Height="1" Fill="#FFFFFF"/>
+        </StackPanel>
+
+    </StackPanel>
+
+</Window>

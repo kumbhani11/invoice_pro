@@ -2,91 +2,84 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:InvoicePro.UI.Dashboard"
              x:DataType="vm:DashboardViewModel"
-             x:Class="InvoicePro.UI.Dashboard.DashboardView">
+             x:Class="InvoicePro.UI.Dashboard.DashboardView"
+             Background="{StaticResource WinBg}">
+
     <Grid RowDefinitions="Auto, *">
-        <!-- Header Section -->
-        <Border Grid.Row="0" Background="{DynamicResource AppPrimaryColor}" Padding="30,20">
-            <StackPanel>
-                <TextBlock Text="INVOICE PRO" FontSize="36" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
-                <TextBlock Text="Welcome to your dashboard" FontSize="16" Foreground="#E5E5E5"/>
-            </StackPanel>
+
+        <!-- Section Header -->
+        <Border Grid.Row="0" Background="{StaticResource WinHighlight}" Padding="10,6">
+            <TextBlock Text="InvoicePro — Commercial Billing System"
+                       FontSize="13" FontWeight="SemiBold" Foreground="White"/>
         </Border>
 
-        <!-- Main Dashboard Tiles -->
-        <ScrollViewer Grid.Row="1" Padding="30">
-            <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                
-                <!-- New Bill Tile -->
-                <Border Classes="Card" Width="300" Height="200" Margin="15" Background="{DynamicResource AppPrimaryColor}">
-                    <Button Command="{Binding NewBillCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="➕" FontSize="48" Foreground="White" HorizontalAlignment="Center"/>
-                            <TextBlock Text="CREATE NEW BILL" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+        <!-- Launcher Grid -->
+        <ScrollViewer Grid.Row="1" Padding="16">
+            <StackPanel Spacing="16">
+
+                <!-- Quick Actions Group -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="QUICK ACTIONS" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{StaticResource WinMuted}" Margin="0,0,0,4"/>
+                    <Border Background="#FFFFFF" BorderBrush="{StaticResource WinBorderLight}"
+                            BorderThickness="1" Padding="8">
+                        <WrapPanel Orientation="Horizontal">
+                            <Button Command="{Binding NewBillCommand}"    Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="📄" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="New Invoice" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding AllBillsCommand}"   Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="🗂" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="All Invoices" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding CustomersCommand}"  Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="👥" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Customers" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding ProductsCommand}"   Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="📦" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Products" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding ReportsCommand}"    Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="📊" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Reports" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding SettingsCommand}"   Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="⚙" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Settings" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding BackupCommand}"     Width="120" Height="72" Margin="4" Background="Transparent" BorderThickness="0">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="💾" FontSize="28" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Backup" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </WrapPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Info Panel -->
+                <Border Background="#FFFFFF" BorderBrush="{StaticResource WinBorderLight}"
+                        BorderThickness="1" Padding="10,8">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="COMPANY" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource WinMuted}"/>
+                        <TextBlock Text="{Binding CompanyDisplayName}" FontSize="13" FontWeight="SemiBold"/>
+                    </StackPanel>
                 </Border>
 
-                <!-- Customers Tile -->
-                <Border Classes="Card" Width="250" Height="200" Margin="15">
-                    <Button Command="{Binding CustomersCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="👥" FontSize="48" HorizontalAlignment="Center"/>
-                            <TextBlock Text="CUSTOMERS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
-
-                <!-- Products Tile -->
-                <Border Classes="Card" Width="250" Height="200" Margin="15">
-                    <Button Command="{Binding ProductsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="📦" FontSize="48" HorizontalAlignment="Center"/>
-                            <TextBlock Text="PRODUCTS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
-
-                <!-- All Bills Tile -->
-                <Border Classes="Card" Width="250" Height="200" Margin="15">
-                    <Button Command="{Binding AllBillsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center"/>
-                            <TextBlock Text="ALL BILLS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
-                
-                <!-- Reports Tile -->
-                <Border Classes="Card" Width="250" Height="200" Margin="15">
-                    <Button Command="{Binding ReportsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="📊" FontSize="48" HorizontalAlignment="Center"/>
-                            <TextBlock Text="REPORTS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
-
-                <!-- Settings Tile -->
-                <Border Classes="Card" Width="250" Height="200" Margin="15">
-                    <Button Command="{Binding SettingsCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="⚙️" FontSize="48" HorizontalAlignment="Center"/>
-                            <TextBlock Text="SETTINGS" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
-                
-                <!-- Backup Tile -->
-                <Border Classes="Card" Width="250" Height="200" Margin="15">
-                    <Button Command="{Binding BackupCommand}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Padding="0">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-                            <TextBlock Text="💾" FontSize="48" HorizontalAlignment="Center"/>
-                            <TextBlock Text="BACKUP" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppTextColor}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
-
-            </WrapPanel>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </UserControl>

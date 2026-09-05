@@ -6,6 +6,8 @@ public class Product {
     public string Fit { get; set; } = string.Empty;
     public string Size { get; set; } = string.Empty;
     public string HSN { get; set; } = string.Empty;
+    public string HSNCode => HSN;
     public string UOM { get; set; } = "Pcs";
     public decimal Rate { get; set; }
+    public decimal TaxPercentage { get; set; } = 18;
 }

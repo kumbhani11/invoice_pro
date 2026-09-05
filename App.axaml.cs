@@ -1,8 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using InvoicePro.ViewModels;
-using InvoicePro.Views;
+using InvoicePro.UI.CompanySelection;
 
 namespace InvoicePro;
 
@@ -17,10 +16,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel(),
-            };
+            desktop.MainWindow = new CompanySelectionView();
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -2,66 +2,98 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:InvoicePro.UI.NewBill"
              x:Class="InvoicePro.UI.NewBill.NewBillView"
-             x:DataType="vm:NewBillViewModel">
+             x:DataType="vm:NewBillViewModel"
+             Background="{StaticResource WinBg}">
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="3">
-        
-        <!-- Header Metadata Details (High Density) -->
-        <Border Grid.Row="0" BorderBrush="{StaticResource WinBorderLight}" BorderThickness="1" Background="#FFFFFF" Padding="6" Margin="0,0,0,3">
-            <Grid ColumnDefinitions="Auto, 140, 16, Auto, 200, 16, Auto, 140" RowDefinitions="26, 26">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Invoice #:" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding InvoiceNumber}" FontFamily="{StaticResource WinFontMono}" FontWeight="Bold"/>
+    <Grid RowDefinitions="Auto, *, Auto">
 
-                <TextBlock Grid.Row="0" Grid.Column="3" Text="Customer:" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="0" Grid.Column="4" ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}" HorizontalAlignment="Stretch" Height="24" CornerRadius="0"/>
+        <!-- Invoice Header Metadata -->
+        <Border Grid.Row="0" Background="#FFFFFF"
+                BorderBrush="#C0C0C0" BorderThickness="0,0,0,1"
+                Padding="6,4">
+            <Grid ColumnDefinitions="Auto,140,20,Auto,200,20,Auto,140" RowDefinitions="28,28">
 
-                <TextBlock Grid.Row="0" Grid.Column="6" Text="Date:" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Invoice #:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <TextBox   Grid.Row="0" Grid.Column="1" Text="{Binding InvoiceNumber}"
+                           FontFamily="{StaticResource WinFontMono}" FontWeight="Bold"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="Customer:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <ComboBox  Grid.Row="0" Grid.Column="4"
+                           ItemsSource="{Binding Customers}"
+                           SelectedItem="{Binding SelectedCustomer}"
+                           DisplayMemberBinding="{Binding Name}"
+                           HorizontalAlignment="Stretch" Height="24" CornerRadius="0"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="6" Text="Date:" VerticalAlignment="Center" Margin="0,0,6,0"/>
                 <DatePicker Grid.Row="0" Grid.Column="7" SelectedDate="{Binding InvoiceDate}" Height="24" CornerRadius="0"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="PO / Ref #:" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ReferenceNumber}" FontFamily="{StaticResource WinFontMono}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="PO / Ref #:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding ReferenceNumber}"
+                           FontFamily="{StaticResource WinFontMono}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="3" Text="Payment Terms:" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding PaymentTerms}"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="Payment Terms:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <TextBox   Grid.Row="1" Grid.Column="4" Text="{Binding PaymentTerms}"/>
             </Grid>
         </Border>
 
-        <!-- Dense DataGrid for Line Items -->
-        <Border Grid.Row="1" BorderBrush="{StaticResource WinBorderLight}" BorderThickness="1" Background="#FFFFFF">
-            <DataGrid ItemsSource="{Binding InvoiceItems}" AutoGenerateColumns="False" CanUserResizeColumns="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="#" Binding="{Binding ItemIndex}" Width="35" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Item Code" Binding="{Binding ProductCode}" Width="110" FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                    <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="70" FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Unit Price" Binding="{Binding UnitPrice, StringFormat='{}{0:N2}'}" Width="90" FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Tax %" Binding="{Binding TaxPercent, StringFormat='{}{0:N1}'}" Width="70" FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount, StringFormat='{}{0:N2}'}" Width="100" FontFamily="{StaticResource WinFontMono}"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Border>
+        <!-- Line Items DataGrid -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding InvoiceItems}"
+                  AutoGenerateColumns="False"
+                  CanUserResizeColumns="True"
+                  BorderThickness="0"
+                  Background="White">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="#"           Binding="{Binding ItemIndex}"                              Width="36"  IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Code"   Binding="{Binding ProductCode}"                            Width="110" FontFamily="{StaticResource WinFontMono}"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}"                            Width="*"/>
+                <DataGridTextColumn Header="HSN"         Binding="{Binding HSN}"                                    Width="80"  FontFamily="{StaticResource WinFontMono}"/>
+                <DataGridTextColumn Header="Qty"         Binding="{Binding Quantity}"                               Width="60"  FontFamily="{StaticResource WinFontMono}"/>
+                <DataGridTextColumn Header="Rate (₹)"   Binding="{Binding Rate, StringFormat='{}{0:N2}'}"          Width="90"  FontFamily="{StaticResource WinFontMono}"/>
+                <DataGridTextColumn Header="Tax %"       Binding="{Binding TaxPercent, StringFormat='{}{0:N1}'}"   Width="65"  FontFamily="{StaticResource WinFontMono}"/>
+                <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount, StringFormat='{}{0:N2}'}"        Width="100" FontFamily="{StaticResource WinFontMono}"/>
+            </DataGrid.Columns>
+        </DataGrid>
 
         <!-- Summary & Action Bar -->
-        <Border Grid.Row="2" Background="{StaticResource WinPanel}" BorderBrush="{StaticResource WinBorderLight}" BorderThickness="1" Margin="0,3,0,0" Padding="6">
+        <Border Grid.Row="2" Background="#F0F0F0"
+                BorderBrush="#C0C0C0" BorderThickness="0,1,0,0"
+                Padding="6,4">
             <Grid ColumnDefinitions="Auto, *, Auto">
+
+                <!-- Row Buttons -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
-                    <Button Content="Add Row" Command="{Binding AddRowCommand}"/>
-                    <Button Content="Remove Row" Command="{Binding RemoveRowCommand}"/>
+                    <Button Content="+ Add Row"    Command="{Binding AddRowCommand}"/>
+                    <Button Content="− Remove Row" Command="{Binding RemoveRowCommand}"/>
                 </StackPanel>
 
-                <!-- Monospace Financial Totals -->
-                <Grid Grid.Column="2" ColumnDefinitions="Auto, 100" RowDefinitions="20, 20, 22" Margin="0,0,8,0">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Subtotal: " HorizontalAlignment="Right"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SubTotal, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Right"/>
+                <!-- Totals -->
+                <Grid Grid.Column="2" ColumnDefinitions="Auto,110" RowDefinitions="22,22,22,22,24">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Gross:"       HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SubTotal,      StringFormat='₹ {0:N2}'}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Total Tax: " HorizontalAlignment="Right"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TaxTotal, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Right"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Discount:"    HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding DiscountAmount}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Stretch" Height="22"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Grand Total: " HorizontalAlignment="Right" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding GrandTotal, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tax (GST):"   HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TaxTotal,      StringFormat='₹ {0:N2}'}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                    <Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="#C0C0C0" VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Grand Total:" HorizontalAlignment="Right" Margin="0,0,8,0" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding GrandTotal,    StringFormat='₹ {0:N2}'}" FontFamily="{StaticResource WinFontMono}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="13"/>
                 </Grid>
+
             </Grid>
         </Border>
-        
+
+        <!-- Save / Clear Buttons (overlaid bottom-right of action bar) -->
+        <Border Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="6,4">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <Button Content="💾 Save Invoice" Command="{Binding SaveInvoiceCommand}" Classes="Success" Height="26" Padding="14,2"/>
+                <Button Content="✖ Clear Form"   Command="{Binding ClearFormCommand}"   Height="26" Padding="14,2"/>
+            </StackPanel>
+        </Border>
+
     </Grid>
 </UserControl>
