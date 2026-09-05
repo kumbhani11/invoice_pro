@@ -5,6 +5,7 @@ namespace InvoicePro.Models;
 
 public class CompanyProfile
 {
+    public int    Id            { get; set; }
     public string CompanyName   { get; set; } = string.Empty;
     public string AddressLine1  { get; set; } = string.Empty;
     public string AddressLine2  { get; set; } = string.Empty;
@@ -14,6 +15,16 @@ public class CompanyProfile
     public string BankBranch    { get; set; } = string.Empty;
     public string BankAccountNo { get; set; } = string.Empty;
     public string BankIFSC      { get; set; } = string.Empty;
+}
+
+public class CustomerModel
+{
+    public int    Id           { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public string Address      { get; set; } = string.Empty;
+    public string GSTIN        { get; set; } = string.Empty;
+    public string State        { get; set; } = string.Empty;
+    public string StateCode    { get; set; } = string.Empty;
 }
 
 public class PartyModel

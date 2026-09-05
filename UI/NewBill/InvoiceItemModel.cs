@@ -3,27 +3,29 @@ using System.Runtime.CompilerServices;
 
 namespace InvoicePro.UI.NewBill;
 
-/// <summary>
-/// Observable row model for the invoice DataGrid.
-/// Amount recalculates automatically when Qty, Rate, or TaxPercent changes.
-/// </summary>
 public class InvoiceItemModel : INotifyPropertyChanged
 {
-    private string _productCode = string.Empty;
-    private string _description = string.Empty;
-    private string _hsn = string.Empty;
-    private int _quantity = 1;
+    private string _productDescription = string.Empty;
+    private string _fit  = string.Empty;
+    private string _size = string.Empty;
+    private string _hsn  = string.Empty;
+    private decimal _qty = 1;
+    private string _uom  = "Pcs";
     private decimal _rate;
-    private decimal _taxPercent;
 
-    public string ProductCode  { get => _productCode;  set => Set(ref _productCode,  value); }
-    public string Description  { get => _description;  set => Set(ref _description,  value); }
-    public string HSN          { get => _hsn;          set => Set(ref _hsn,          value); }
+    // Row index — set by ViewModel after collection changes
+    public int SNo { get; set; }
 
-    public int Quantity
+    public string ProductDescription { get => _productDescription; set => Set(ref _productDescription, value); }
+    public string Fit  { get => _fit;  set => Set(ref _fit,  value); }
+    public string Size { get => _size; set => Set(ref _size, value); }
+    public string Hsn  { get => _hsn;  set => Set(ref _hsn,  value); }
+    public string Uom  { get => _uom;  set => Set(ref _uom,  value); }
+
+    public decimal Qty
     {
-        get => _quantity;
-        set { Set(ref _quantity, value); Recalculate(); }
+        get => _qty;
+        set { Set(ref _qty, value); Recalculate(); }
     }
 
     public decimal Rate
@@ -32,25 +34,12 @@ public class InvoiceItemModel : INotifyPropertyChanged
         set { Set(ref _rate, value); Recalculate(); }
     }
 
-    public decimal TaxPercent
-    {
-        get => _taxPercent;
-        set { Set(ref _taxPercent, value); Recalculate(); }
-    }
-
-    // Read-only — updated by Recalculate()
-    public decimal TaxAmount { get; private set; }
-    public decimal Amount    { get; private set; }
-
-    // Row index shown in the # column — set by the ViewModel after collection changes
-    public int ItemIndex { get; set; }
+    // Read-only — Qty * Rate
+    public decimal Amount { get; private set; }
 
     private void Recalculate()
     {
-        decimal baseAmount = Quantity * Rate;
-        TaxAmount = System.Math.Round(baseAmount * TaxPercent / 100m, 2);
-        Amount    = baseAmount + TaxAmount;
-        OnPropertyChanged(nameof(TaxAmount));
+        Amount = System.Math.Round(_qty * _rate, 2);
         OnPropertyChanged(nameof(Amount));
     }
 

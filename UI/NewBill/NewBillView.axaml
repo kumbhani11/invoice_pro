@@ -6,39 +6,80 @@
              x:DataType="vm:NewBillViewModel"
              Background="{StaticResource WinBg}">
 
-    <!-- 75% Left / 25% Right split -->
-    <Grid ColumnDefinitions="3*, 1*">
+    <!-- Left takes all space; splitter + preview only consume space when visible -->
+    <Grid ColumnDefinitions="*, Auto, Auto">
 
         <!-- ═══ LEFT PANEL — Invoice Entry (75%) ═══ -->
         <Grid Grid.Column="0" RowDefinitions="Auto, *, Auto">
 
-            <!-- Invoice Header Metadata -->
+            <!-- ═══ INVOICE HEADER ═══ -->
             <Border Grid.Row="0" Background="#FFFFFF"
                     BorderBrush="#C0C0C0" BorderThickness="0,0,0,1"
                     Padding="6,4">
-                <Grid ColumnDefinitions="Auto,140,20,Auto,200,20,Auto,140" RowDefinitions="28,28">
+                <StackPanel Spacing="4">
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Invoice #:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox   Grid.Row="0" Grid.Column="1" Text="{Binding InvoiceNumber}"
-                               FontFamily="{StaticResource WinFontMono}" FontWeight="Bold" IsReadOnly="True"/>
+                    <!-- ROW 1: Active Company (left) | Invoice meta (right) -->
+                    <Grid ColumnDefinitions="*, 8, Auto,100, 8, Auto,110, 8, Auto,80, 8, Auto,60">
+                        <!-- Active company name — read-only bold label -->
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding SelectedCompany.CompanyName}"
+                                   FontWeight="Bold" FontSize="13"
+                                   VerticalAlignment="Center"/>
 
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Customer:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <ComboBox  Grid.Row="0" Grid.Column="4"
-                               ItemsSource="{Binding Customers}"
-                               SelectedItem="{Binding SelectedCustomer}"
-                               DisplayMemberBinding="{Binding Name}"
-                               HorizontalAlignment="Stretch" Height="24" CornerRadius="0"/>
+                        <TextBlock Grid.Column="2"  Text="Invoice No:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,4,0" FontSize="11"/>
+                        <TextBox   Grid.Column="3"  Text="{Binding InvoiceNumber}" FontFamily="{StaticResource WinFontMono}" FontWeight="Bold" Height="22" CornerRadius="0" FontSize="11"/>
 
-                    <TextBlock Grid.Row="0" Grid.Column="6" Text="Date:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <DatePicker Grid.Row="0" Grid.Column="7" SelectedDate="{Binding InvoiceDate}" Height="24" CornerRadius="0"/>
+                        <TextBlock Grid.Column="5"  Text="Date:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,4,0" FontSize="11"/>
+                        <DatePicker Grid.Column="6" SelectedDate="{Binding InvoiceDate}" Height="22" CornerRadius="0" FontSize="11"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="PO / Ref #:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding ReferenceNumber}"
-                               FontFamily="{StaticResource WinFontMono}"/>
+                        <TextBlock Grid.Column="8"  Text="State:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
+                        <TextBox   Grid.Column="9"  Text="{Binding InvoiceState}" Height="22" CornerRadius="0" FontSize="11"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Payment Terms:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox   Grid.Row="1" Grid.Column="4" Text="{Binding PaymentTerms}"/>
-                </Grid>
+                        <TextBlock Grid.Column="11" Text="Code:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
+                        <TextBox   Grid.Column="12" Text="{Binding InvoiceStateCode}" Height="22" CornerRadius="0" FontSize="11"/>
+                    </Grid>
+
+                    <!-- ROW 2: Customer Selection -->
+                    <Grid ColumnDefinitions="Auto, 160, 8, *">
+                        <TextBlock Grid.Column="0" Text="Select Customer:" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" FontSize="11" Margin="0,0,6,0"/>
+                        <ComboBox  Grid.Column="1"
+                                   ItemsSource="{Binding Customers}"
+                                   SelectedItem="{Binding SelectedCustomer}"
+                                   DisplayMemberBinding="{Binding CustomerName}"
+                                   Height="22" CornerRadius="0" FontSize="11"
+                                   HorizontalAlignment="Stretch"/>
+                        <!-- Read-only confirmation strip -->
+                        <TextBlock Grid.Column="3"
+                                   FontSize="10" Foreground="#555" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}  |  GSTIN: {1}  |  {2} ({3})">
+                                    <Binding Path="SelectedCustomer.Address" FallbackValue=""/>
+                                    <Binding Path="SelectedCustomer.GSTIN"   FallbackValue=""/>
+                                    <Binding Path="SelectedCustomer.State"   FallbackValue=""/>
+                                    <Binding Path="SelectedCustomer.StateCode" FallbackValue=""/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- ROW 3: Transport info -->
+                    <Grid ColumnDefinitions="Auto,80, 8, Auto,130, 8, Auto,110, 8, Auto,*">
+                        <TextBlock Grid.Column="0"  Text="Reverse Charge:" VerticalAlignment="Center" FontSize="11" Margin="0,0,4,0"/>
+                        <ComboBox  Grid.Column="1"  SelectedItem="{Binding ReverseCharge}" Height="22" CornerRadius="0" FontSize="11">
+                            <ComboBoxItem>Yes</ComboBoxItem>
+                            <ComboBoxItem>No</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Grid.Column="3"  Text="Transport:" VerticalAlignment="Center" FontSize="11" Margin="0,0,4,0"/>
+                        <TextBox   Grid.Column="4"  Text="{Binding TransportName}" Height="22" CornerRadius="0" FontSize="11"/>
+                        <TextBlock Grid.Column="6"  Text="Date of Supply:" VerticalAlignment="Center" FontSize="11" Margin="0,0,4,0"/>
+                        <DatePicker Grid.Column="7" SelectedDate="{Binding DateOfSupply}" Height="22" CornerRadius="0" FontSize="11"/>
+                        <TextBlock Grid.Column="9"  Text="Place of Supply:" VerticalAlignment="Center" FontSize="11" Margin="0,0,4,0"/>
+                        <TextBox   Grid.Column="10" Text="{Binding PlaceOfSupply}" Height="22" CornerRadius="0" FontSize="11"/>
+                    </Grid>
+
+                </StackPanel>
             </Border>
 
             <!-- Line Items DataGrid -->
@@ -46,17 +87,107 @@
                       ItemsSource="{Binding InvoiceItems}"
                       AutoGenerateColumns="False"
                       CanUserResizeColumns="True"
-                      BorderThickness="0"
+                      GridLinesVisibility="All"
+                      HorizontalGridLinesBrush="#D4D4D4"
+                      VerticalGridLinesBrush="#D4D4D4"
+                      BorderThickness="1"
+                      BorderBrush="#A0A0A0"
+                      RowHeight="28"
                       Background="White">
+
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="BorderBrush" Value="#A0A0A0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="4,0"/>
+                    </Style>
+                </DataGrid.Styles>
+
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="#"           Binding="{Binding ItemIndex}"                                    Width="36"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Item Code"   Binding="{Binding ProductCode}"                                  Width="110" FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Description" Binding="{Binding Description}"                                  Width="*"/>
-                    <DataGridTextColumn Header="HSN"         Binding="{Binding HSN}"                                          Width="80"  FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Qty"         Binding="{Binding Quantity}"                                     Width="60"  FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Rate (₹)"   Binding="{Binding Rate,       StringFormat='{}{0:N2}'}"          Width="90"  FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Tax %"       Binding="{Binding TaxPercent, StringFormat='{}{0:N1}'}"          Width="65"  FontFamily="{StaticResource WinFontMono}"/>
-                    <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount,     StringFormat='{}{0:N2}'}"          Width="100" FontFamily="{StaticResource WinFontMono}" IsReadOnly="True"/>
+                    <!-- S. No. — center -->
+                    <DataGridTemplateColumn Header="S. No." Width="0.6*" MinWidth="45" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding SNo}" TextAlignment="Center" VerticalAlignment="Center" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Product Description — left -->
+                    <DataGridTemplateColumn Header="Product Discription" Width="3.5*" MinWidth="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding ProductDescription}" TextAlignment="Left" VerticalAlignment="Center" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding ProductDescription}" BorderThickness="0" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- FIT — center -->
+                    <DataGridTemplateColumn Header="FIT" Width="1*" MinWidth="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Fit}" TextAlignment="Center" VerticalAlignment="Center" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding Fit}" BorderThickness="0" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- SIZE — center -->
+                    <DataGridTemplateColumn Header="SIZE" Width="1.2*" MinWidth="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Size}" TextAlignment="Center" VerticalAlignment="Center" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding Size}" BorderThickness="0" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- HSN — center, mono -->
+                    <DataGridTemplateColumn Header="HSN" Width="1.2*" MinWidth="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Hsn}" TextAlignment="Center" VerticalAlignment="Center" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding Hsn}" BorderThickness="0" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- QTY — center, mono -->
+                    <DataGridTemplateColumn Header="QTY" Width="0.8*" MinWidth="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Qty}" TextAlignment="Center" VerticalAlignment="Center" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding Qty}" BorderThickness="0" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- UOM — center -->
+                    <DataGridTemplateColumn Header="UOM" Width="0.8*" MinWidth="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Uom}" TextAlignment="Center" VerticalAlignment="Center" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding Uom}" BorderThickness="0" Padding="4,0"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Rate — right, mono -->
+                    <DataGridTemplateColumn Header="Rate" Width="1.2*" MinWidth="70">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Rate, StringFormat='{}{0:N2}'}" TextAlignment="Right" VerticalAlignment="Center" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate><TextBox Text="{Binding Rate}" BorderThickness="0" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- AMOUNT RS. — right, mono, read-only -->
+                    <DataGridTemplateColumn Header="AMOUNT RS." Width="1.5*" MinWidth="90" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate><TextBlock Text="{Binding Amount, StringFormat='{}{0:N2}'}" TextAlignment="Right" VerticalAlignment="Center" Padding="4,0" FontFamily="{StaticResource WinFontMono}"/></DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
 
@@ -73,26 +204,77 @@
                             <Button Content="− Remove Row" Command="{Binding RemoveRowCommand}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Button Content="💾 Save Invoice" Command="{Binding SaveInvoiceCommand}" Classes="Success" Height="26" Padding="14,2"/>
-                            <Button Content="✖ Clear Form"   Command="{Binding ClearFormCommand}"   Height="26" Padding="14,2"/>
+                            <Button Content="💾 Save Invoice"  Command="{Binding SaveInvoiceCommand}"  Classes="Success" Height="26" Padding="14,2"/>
+                            <Button Content="✖ Clear Form"    Command="{Binding ClearFormCommand}"    Height="26" Padding="14,2"/>
+                            <Button Content="👁 Preview"       Command="{Binding TogglePreviewCommand}" Height="26" Padding="14,2"/>
                         </StackPanel>
                     </StackPanel>
 
                     <!-- Right: Totals -->
-                    <Grid Grid.Column="2" ColumnDefinitions="Auto,110" RowDefinitions="22,22,22,22,24">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Gross:"       HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SubTotal,   StringFormat='₹ {0:N2}'}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <Grid Grid.Column="2" ColumnDefinitions="Auto,16,90,90" RowDefinitions="22,22,22,22,22,22,1,26">
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Discount:"    HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <TextBox   Grid.Row="1" Grid.Column="1" Text="{Binding DiscountAmount}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Stretch" Height="22"/>
+                        <!-- Gross Total -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Gross Total:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2"
+                                   Text="{Binding SubTotal, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Tax (GST):"   HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TaxTotal,   StringFormat='₹ {0:N2}'}" FontFamily="{StaticResource WinFontMono}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <!-- Discount -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Discount:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBox   Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                                   Text="{Binding DiscountAmount}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Stretch" Height="22" CornerRadius="0"/>
 
-                        <Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="#C0C0C0" VerticalAlignment="Center"/>
+                        <!-- Taxable Amount -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Taxable Amount:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2"
+                                   Text="{Binding TaxableAmount, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Grand Total:" HorizontalAlignment="Right" Margin="0,0,8,0" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding GrandTotal, StringFormat='₹ {0:N2}'}" FontFamily="{StaticResource WinFontMono}" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="13"/>
+                        <!-- CGST -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="CGST:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="3" Grid.Column="2"
+                                   Text="{Binding GstPercentage, StringFormat='{}{0:0.#}% / 2'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+                        <TextBlock Grid.Row="3" Grid.Column="3"
+                                   Text="{Binding CgstAmount, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                        <!-- SGST -->
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="SGST:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="4" Grid.Column="2"
+                                   Text="{Binding GstPercentage, StringFormat='{}{0:0.#}% / 2'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
+                        <TextBlock Grid.Row="4" Grid.Column="3"
+                                   Text="{Binding SgstAmount, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                        <!-- GST % selector row -->
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="GST %:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <ComboBox  Grid.Row="5" Grid.Column="2"
+                                   SelectedItem="{Binding GstPercentage}" Height="22" CornerRadius="0" FontSize="11">
+                            <x:Double>5</x:Double>
+                            <x:Double>12</x:Double>
+                            <x:Double>18</x:Double>
+                            <x:Double>28</x:Double>
+                        </ComboBox>
+                        <TextBlock Grid.Row="5" Grid.Column="3"
+                                   Text="{Binding TaxTotal, StringFormat='{}{0:N2}'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                        <!-- Divider -->
+                        <Rectangle Grid.Row="6" Grid.ColumnSpan="4" Height="1" Fill="#C0C0C0" VerticalAlignment="Center"/>
+
+                        <!-- Round Off -->
+                        <!-- NET AMOUNT -->
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="NET AMOUNT (Rs.):" HorizontalAlignment="Right" Margin="0,0,6,0"
+                                   FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="7" Grid.Column="2"
+                                   Text="{Binding RoundOffAmount, StringFormat='±{0:N2}'}" FontFamily="{StaticResource WinFontMono}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" Foreground="#666"/>
+                        <TextBlock Grid.Row="7" Grid.Column="3"
+                                   Text="{Binding GrandTotal, StringFormat='{}{0:N0}'}" FontFamily="{StaticResource WinFontMono}"
+                                   FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="13"/>
                     </Grid>
 
                 </Grid>
@@ -101,11 +283,13 @@
         </Grid>
 
         <!-- ═══ SPLITTER ═══ -->
-        <GridSplitter Grid.Column="0" Width="4" HorizontalAlignment="Right"
+        <GridSplitter Grid.Column="1" Width="4"
+                      IsVisible="{Binding IsPreviewVisible}"
                       Background="#C0C0C0" ResizeDirection="Columns"/>
 
         <!-- ═══ RIGHT PANEL — Live Preview (25%) ═══ -->
-        <Border Grid.Column="1"
+        <Border Grid.Column="2" Width="320"
+                IsVisible="{Binding IsPreviewVisible}"
                 Background="#E8E8E8"
                 BorderBrush="#ABABAB"
                 BorderThickness="1"

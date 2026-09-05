@@ -7,22 +7,11 @@ namespace InvoicePro.Services;
 
 public static class DummyDataStore
 {
-    public static CompanyProfile GetCompanyProfile(string companyName) => companyName switch
+    public static readonly List<CompanyProfile> Companies = new()
     {
-        "HARDIKA CREATION" => new CompanyProfile
+        new CompanyProfile
         {
-            CompanyName   = "HARDIKA CREATION",
-            AddressLine1  = "Regd.Off: Shop No.5, Laxmi Niwas, Near Bus Stand, Kandivali (E), Mumbai-400101",
-            AddressLine2  = "Sales Office: 12B, Textile Market, Ring Road, Surat-395002",
-            Contact       = "Ph. +91 9876543210",
-            GSTIN         = "24BCDPK1234C1Z5",
-            BankName      = "STATE BANK OF INDIA",
-            BankBranch    = "Kandivali East",
-            BankAccountNo = "12345678901234",
-            BankIFSC      = "SBIN0001234"
-        },
-        _ => new CompanyProfile  // Default: AVANI ENTERPRISE
-        {
+            Id            = 1,
             CompanyName   = "AVANI ENTERPRISE",
             AddressLine1  = "Regd.Off: B-701, Royal Accord CHS, Nr.Association hall, Yoginagar, Borivali (W), Mum-91",
             AddressLine2  = "Sales Office: 38A/19 Saraswati Niwas, Gr.Floor, Near Jain Hostel, Elphinstone Road (W) Mumbai-400013.",
@@ -32,8 +21,55 @@ public static class DummyDataStore
             BankBranch    = "Yoginagar (Borivali)",
             BankAccountNo = "99680 2000 00732",
             BankIFSC      = "BARB0DBYOGI"
+        },
+        new CompanyProfile
+        {
+            Id            = 2,
+            CompanyName   = "HARDIKA CREATION",
+            AddressLine1  = "Regd.Off: Shop No.5, Laxmi Niwas, Near Bus Stand, Kandivali (E), Mumbai-400101",
+            AddressLine2  = "Sales Office: 12B, Textile Market, Ring Road, Surat-395002",
+            Contact       = "Ph. +91 9876543210",
+            GSTIN         = "24BCDPK1234C1Z5",
+            BankName      = "STATE BANK OF INDIA",
+            BankBranch    = "Kandivali East",
+            BankAccountNo = "12345678901234",
+            BankIFSC      = "SBIN0001234"
         }
     };
+
+    public static readonly List<CustomerModel> Customers = new()
+    {
+        new CustomerModel
+        {
+            Id           = 1,
+            CustomerName = "YASH COLLECTION",
+            Address      = "8/A SADASHIV BHUVAN R.R.T ROAD BHAJI MARKET MULUND WEST",
+            GSTIN        = "27AAEPG5504F1Z4",
+            State        = "MAHARASTRA",
+            StateCode    = "27"
+        },
+        new CustomerModel
+        {
+            Id           = 2,
+            CustomerName = "CHANDUMAL SONS",
+            Address      = "Shop No.12, Cloth Market, Masjid Bunder, Mumbai-400009",
+            GSTIN        = "27AABFC1234D1Z3",
+            State        = "MAHARASTRA",
+            StateCode    = "27"
+        },
+        new CustomerModel
+        {
+            Id           = 3,
+            CustomerName = "SHREE TEXTILES",
+            Address      = "45, Gandhi Market, Ulhasnagar-421003",
+            GSTIN        = "27AACFS9876E1Z2",
+            State        = "MAHARASTRA",
+            StateCode    = "27"
+        }
+    };
+
+    public static CompanyProfile GetCompanyProfile(string companyName) =>
+        Companies.Find(c => c.CompanyName == companyName) ?? Companies[0];
 
     public static InvoiceModel GetDummyInvoice(string companyName)
     {

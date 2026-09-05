@@ -34,16 +34,16 @@
           <!-- Left 60%: Company details -->
           <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="4">
             <StackPanel Spacing="1">
-              <TextBlock Text="{Binding CompanyProfile.CompanyName}"
+              <TextBlock Text="{Binding SelectedCompany.CompanyName}"
                          FontSize="14" FontWeight="Bold"/>
-              <TextBlock Text="{Binding CompanyProfile.AddressLine1}"
+              <TextBlock Text="{Binding SelectedCompany.AddressLine1}"
                          FontSize="8" TextWrapping="Wrap"/>
-              <TextBlock Text="{Binding CompanyProfile.AddressLine2}"
+              <TextBlock Text="{Binding SelectedCompany.AddressLine2}"
                          FontSize="8" TextWrapping="Wrap"/>
-              <TextBlock Text="{Binding CompanyProfile.Contact}" FontSize="8"/>
+              <TextBlock Text="{Binding SelectedCompany.Contact}" FontSize="8"/>
               <StackPanel Orientation="Horizontal" Spacing="2">
                 <TextBlock Text="GSTIN:" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Text="{Binding CompanyProfile.GSTIN}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SelectedCompany.GSTIN}" FontWeight="Bold" FontSize="8"/>
               </StackPanel>
             </StackPanel>
           </Border>
@@ -58,10 +58,10 @@
               <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding InvoiceDate, StringFormat=': {0:dd/MM/yyyy}'}"
                          FontWeight="Bold" HorizontalAlignment="Right" Margin="0,1"/>
               <TextBlock Grid.Row="2" Grid.Column="0" Text="State" FontWeight="Bold" Margin="0,1"/>
-              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedCustomer.State, StringFormat=': {0}'}"
+              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding InvoiceState, StringFormat=': {0}'}"
                          FontWeight="Bold" HorizontalAlignment="Right" Margin="0,1"/>
               <TextBlock Grid.Row="3" Grid.Column="0" Text="State Code" FontWeight="Bold" Margin="0,1"/>
-              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedCustomer.StateCode, StringFormat=': {0}'}"
+              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding InvoiceStateCode, StringFormat=': {0}'}"
                          FontWeight="Bold" HorizontalAlignment="Right" Margin="0,1"/>
             </Grid>
           </Border>
@@ -79,7 +79,7 @@
             <StackPanel Spacing="2">
               <StackPanel Orientation="Horizontal" Spacing="3">
                 <TextBlock Text="Bill to party:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SelectedCustomer.Name}" FontWeight="Bold" FontSize="11"/>
+                <TextBlock Text="{Binding SelectedCustomer.CustomerName}" FontWeight="Bold" FontSize="11"/>
               </StackPanel>
               <TextBlock Text="{Binding SelectedCustomer.Address}"
                          Margin="70,0,0,0" TextWrapping="Wrap" FontSize="8"/>
@@ -101,7 +101,7 @@
             <StackPanel Spacing="2">
               <StackPanel Orientation="Horizontal" Spacing="3">
                 <TextBlock Text="Supply to party" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SelectedCustomer.Name}" FontWeight="Bold" FontSize="11"/>
+                <TextBlock Text="{Binding SelectedCustomer.CustomerName}" FontWeight="Bold" FontSize="11"/>
               </StackPanel>
               <TextBlock Text="{Binding SelectedCustomer.Address}"
                          Margin="70,0,0,0" TextWrapping="Wrap" FontSize="8"/>
@@ -126,20 +126,20 @@
         <Grid ColumnDefinitions="*,*,*,*">
           <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2">
             <TextBlock Text="Reverse Charge:" FontWeight="Bold" FontSize="8"/>
-            <TextBlock Text="{Binding PreviewReverseCharge}" FontSize="8"/>
+            <TextBlock Text="{Binding ReverseCharge}" FontSize="8"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
             <TextBlock Text="Transport :" FontWeight="Bold" FontSize="8"/>
-            <TextBlock Text="{Binding PreviewTransport}" FontSize="8"/>
+            <TextBlock Text="{Binding TransportName}" FontSize="8"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2">
             <TextBlock Text="Date of Supply:" FontWeight="Bold" FontSize="8"/>
-            <TextBlock Text="{Binding PreviewDateOfSupply}" FontSize="8"/>
+            <TextBlock Text="{Binding DateOfSupply, StringFormat='{}{0:dd/MM/yyyy}'}" FontSize="8"/>
           </StackPanel>
           <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2"
                       HorizontalAlignment="Right">
             <TextBlock Text="Place of Supply:" FontWeight="Bold" FontSize="8"/>
-            <TextBlock Text="{Binding PreviewPlaceOfSupply}" FontSize="8"/>
+            <TextBlock Text="{Binding PlaceOfSupply}" FontSize="8"/>
           </StackPanel>
         </Grid>
       </Border>
@@ -429,11 +429,11 @@
               <!-- Bank name + branch -->
               <Grid ColumnDefinitions="65,*,*" Margin="0,2,0,0">
                 <TextBlock Grid.Column="0" Text="Bank Name :" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Grid.Column="1" Text="{Binding CompanyProfile.BankName}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="1" Text="{Binding SelectedCompany.BankName}" FontWeight="Bold" FontSize="8"/>
                 <TextBlock Grid.Column="2" FontWeight="Bold" FontSize="8">
                   <TextBlock.Text>
                     <MultiBinding StringFormat="Branch : {0}">
-                      <Binding Path="CompanyProfile.BankBranch"/>
+                      <Binding Path="SelectedCompany.BankBranch"/>
                     </MultiBinding>
                   </TextBlock.Text>
                 </TextBlock>
@@ -441,12 +441,12 @@
               <!-- Account -->
               <Grid ColumnDefinitions="65,*">
                 <TextBlock Grid.Column="0" Text="Bank A/C:" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Grid.Column="1" Text="{Binding CompanyProfile.BankAccountNo}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="1" Text="{Binding SelectedCompany.BankAccountNo}" FontWeight="Bold" FontSize="8"/>
               </Grid>
               <!-- IFSC -->
               <Grid ColumnDefinitions="65,*">
                 <TextBlock Grid.Column="0" Text="Bank IFSC:" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Grid.Column="1" Text="{Binding CompanyProfile.BankIFSC}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Grid.Column="1" Text="{Binding SelectedCompany.BankIFSC}" FontWeight="Bold" FontSize="8"/>
               </Grid>
               <!-- Terms -->
               <TextBlock Text="Terms &amp; conditions :" FontWeight="Bold"
@@ -469,7 +469,7 @@
                            HorizontalAlignment="Center" Margin="0,4,0,0">
                   <TextBlock.Text>
                     <MultiBinding StringFormat="For {0}">
-                      <Binding Path="PreviewCompanyName"/>
+                      <Binding Path="SelectedCompany.CompanyName"/>
                     </MultiBinding>
                   </TextBlock.Text>
                 </TextBlock>
