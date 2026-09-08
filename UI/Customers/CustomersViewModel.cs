@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InvoicePro.Data.SQLite;
 using InvoicePro.Models;
+using InvoicePro.Services;
 using InvoicePro.ViewModels;
 
 namespace InvoicePro.UI.Customers;
@@ -67,21 +68,55 @@ public partial class CustomersViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void EditCustomer(Customer? customer)
+    {
+        if (customer == null) return;
+
+        CurrentCustomer = new Customer
+        {
+            Id = customer.Id,
+            Name = customer.Name,
+            GSTIN = customer.GSTIN,
+            Phone = customer.Phone,
+            Address = customer.Address,
+            State = customer.State,
+            StateCode = customer.StateCode
+        };
+        IsEditing = true;
+    }
+
+    [RelayCommand]
     private async Task SaveAsync()
     {
-        using var db = new BillingDbContext();
-        if (CurrentCustomer.Id == 0)
+        if (string.IsNullOrWhiteSpace(CurrentCustomer?.Name))
         {
-            db.Customers.Add(CurrentCustomer);
+            NavigationService.SetStatus?.Invoke("Customer name is required.");
+            return;
         }
-        else
+
+        try
         {
-            db.Customers.Update(CurrentCustomer);
+            using var db = new BillingDbContext();
+            if (CurrentCustomer.Id == 0)
+            {
+                db.Customers.Add(CurrentCustomer);
+            }
+            else
+            {
+                db.Customers.Update(CurrentCustomer);
+            }
+            await db.SaveChangesAsync();
+
+            IsEditing = false;
+            await LoadCustomersAsync();
+            // notify others (e.g., NewBill) that customers changed
+            SessionContext.NotifyCustomersChanged();
+            NavigationService.SetStatus?.Invoke("Customer saved.");
         }
-        await db.SaveChangesAsync();
-        
-        IsEditing = false;
-        await LoadCustomersAsync();
+        catch (System.Exception ex)
+        {
+            NavigationService.SetStatus?.Invoke($"Failed to save customer: {ex.Message}");
+        }
     }
 
     [RelayCommand]
@@ -91,12 +126,30 @@ public partial class CustomersViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void DeleteSelected()
+    private async Task DeleteSelected()
     {
         if (SelectedCustomer == null) return;
-        using var db = new BillingDbContext();
-        db.Customers.Remove(SelectedCustomer);
-        db.SaveChanges();
-        _ = LoadCustomersAsync();
+        await DeleteCustomer(SelectedCustomer);
+    }
+
+    [RelayCommand]
+    private async Task DeleteCustomer(Customer? customer)
+    {
+        if (customer == null) return;
+        try
+        {
+            using var db = new BillingDbContext();
+            // Attach a stub entity to ensure deletion works even if detached
+            var stub = new Customer { Id = customer.Id };
+            db.Entry(stub).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await db.SaveChangesAsync();
+            await LoadCustomersAsync();
+            SessionContext.NotifyCustomersChanged();
+            NavigationService.SetStatus?.Invoke("Customer deleted.");
+        }
+        catch (System.Exception ex)
+        {
+            NavigationService.SetStatus?.Invoke($"Failed to delete customer: {ex.Message}");
+        }
     }
 }

@@ -85,8 +85,45 @@ public partial class NewBillViewModel : ViewModelBase
         SelectedCompany = DummyDataStore.GetCompanyProfile(selectedCompanyName);
         PreviewCompanyName = SelectedCompany.CompanyName;
         Customers = new ObservableCollection<CustomerModel>(DummyDataStore.Customers);
+        // Load customers from the company-specific database (if available)
+        _ = LoadCustomersFromDbAsync();
+        // Reload customers when the current company changes at runtime
+        SessionContext.CurrentCompanyChanged += async _ => await LoadCustomersFromDbAsync();
+        // Reload customers when any other part of the app mutates customers
+        SessionContext.CustomersChanged += async () => await LoadCustomersFromDbAsync();
         InvoiceItems.CollectionChanged += OnCollectionChanged;
         _ = LoadCompanyFromDbAsync();
+    }
+
+    private async Task LoadCustomersFromDbAsync()
+    {
+        try
+        {
+            using var db = new BillingDbContext();
+            var list = await db.Customers.ToListAsync();
+            if (list != null && list.Count > 0)
+            {
+                Customers = new ObservableCollection<CustomerModel>(
+                    list.ConvertAll(c => new CustomerModel
+                    {
+                        Id = c.Id,
+                        CustomerName = c.Name,
+                        Address = c.Address,
+                        GSTIN = c.GSTIN,
+                        State = c.State,
+                        StateCode = c.StateCode
+                    })
+                );
+                return;
+            }
+        }
+        catch
+        {
+            // ignore DB errors and fall back to dummy data
+        }
+
+        // Fallback to dummy store if DB empty or unavailable
+        Customers = new ObservableCollection<CustomerModel>(DummyDataStore.Customers);
     }
 
     private async Task LoadCompanyFromDbAsync()
@@ -270,9 +307,9 @@ public partial class NewBillViewModel : ViewModelBase
             await db.SaveChangesAsync();
             await tx.CommitAsync();
 
-            GenerateAndSavePdf(invoice.InvoiceNumber);
-            NavigationService.SetStatus?.Invoke($"Invoice {invoice.InvoiceNumber} saved.");
-            ClearForm();
+            // Do not generate PDF here — use in-app preview instead.
+            IsPreviewVisible = true;
+            NavigationService.SetStatus?.Invoke($"Invoice {invoice.InvoiceNumber} saved. Preview available.");
         }
         catch
         {

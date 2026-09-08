@@ -50,7 +50,10 @@
                     <TextBlock Text="{Binding StatusText}" FontSize="11" VerticalAlignment="Center"/>
                 </Border>
                 <Border Grid.Column="1" BorderBrush="#C0C0C0" BorderThickness="0,0,1,0" Padding="10,2">
-                    <TextBlock Text="{Binding CompanyName}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{Binding CompanyName}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <Button Content="Switch" Command="{Binding SwitchCompanyCommand}" Width="64" Height="20"/>
+                    </StackPanel>
                 </Border>
                 <Border Grid.Column="2" BorderBrush="#C0C0C0" BorderThickness="0,0,1,0" Padding="10,2">
                     <TextBlock Text="{Binding InvoiceCountText}" FontSize="11" VerticalAlignment="Center"/>

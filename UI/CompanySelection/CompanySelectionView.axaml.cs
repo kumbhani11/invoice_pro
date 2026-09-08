@@ -9,4 +9,10 @@ public partial class CompanySelectionView : Window
         InitializeComponent();
         DataContext = new CompanySelectionViewModel(this);
     }
+
+    public CompanySelectionView(bool createMainWindowOnSelect)
+    {
+        InitializeComponent();
+        DataContext = new CompanySelectionViewModel(this, createMainWindowOnSelect);
+    }
 }

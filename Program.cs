@@ -16,6 +16,15 @@ sealed class Program
     {
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
+        var runTests = Environment.GetEnvironmentVariable("INVOICEPRO_RUN_TESTS");
+        if (!string.IsNullOrEmpty(runTests) && runTests != "0")
+        {
+            // Run internal tests and exit
+            var code = TestRunner.RunAll();
+            Environment.Exit(code);
+            return;
+        }
+
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 

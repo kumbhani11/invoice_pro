@@ -198,25 +198,25 @@
             <DataTemplate>
               <Grid ColumnDefinitions="39,211,94,70,55,47,47,78,141" MinHeight="18">
                 <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="{Binding ItemIndex}" HorizontalAlignment="Center" FontSize="8"/>
+                  <TextBlock Text="{Binding SNo}" HorizontalAlignment="Center" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="{Binding Description}" FontSize="8"/>
+                  <TextBlock Text="{Binding ProductDescription}" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="{Binding ProductCode}" HorizontalAlignment="Center" FontSize="8"/>
+                  <TextBlock Text="{Binding Fit}" HorizontalAlignment="Center" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="" HorizontalAlignment="Center" FontSize="8"/>
+                  <TextBlock Text="{Binding Size}" HorizontalAlignment="Center" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="4" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="{Binding HSN}" HorizontalAlignment="Center" FontSize="8"/>
+                  <TextBlock Text="{Binding Hsn}" HorizontalAlignment="Center" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="{Binding Quantity}" HorizontalAlignment="Center" FontSize="8"/>
+                  <TextBlock Text="{Binding Qty}" HorizontalAlignment="Center" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="6" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                  <TextBlock Text="Pcs" HorizontalAlignment="Center" FontSize="8"/>
+                  <TextBlock Text="{Binding Uom}" HorizontalAlignment="Center" FontSize="8"/>
                 </Border>
                 <Border Grid.Column="7" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
                   <TextBlock Text="{Binding Rate, StringFormat='{}{0:F2}'}" HorizontalAlignment="Center" FontSize="8"/>

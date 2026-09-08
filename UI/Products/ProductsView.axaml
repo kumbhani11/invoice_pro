@@ -62,7 +62,7 @@
 
                         <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,10,0,0" HorizontalAlignment="Right">
                             <Button Content="Cancel" Command="{Binding CancelEditCommand}"/>
-                            <Button Content="Save"   Command="{Binding SaveAsyncCommand}" Classes="Success"/>
+                            <Button Content="Save"   Command="{Binding SaveCommand}" Classes="Success"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

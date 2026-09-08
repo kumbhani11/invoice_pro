@@ -4,7 +4,8 @@
              x:DataType="vm:NewBillViewModel"
              x:Class="InvoicePro.UI.NewBill.NewBillView">
 
-    <ScrollViewer>
+    <Grid RowDefinitions="Auto,Auto">
+        <ScrollViewer Grid.Row="0">
         <StackPanel Margin="10" Spacing="10">
             
             <!-- 4-BOX HEADER SECTION -->
@@ -46,18 +47,24 @@
                     <StackPanel Spacing="2">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Bill to party: " VerticalAlignment="Center"/>
-                            <ComboBox ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}" Width="250" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}" Width="250" VerticalAlignment="Center">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding CustomerName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                         
                         <TextBlock Text="{Binding SelectedCustomer.Address}" TextWrapping="Wrap" Margin="10,5,0,15" MinHeight="35"/>
                         
                         <Grid ColumnDefinitions="Auto, *, Auto, Auto" RowDefinitions="Auto, Auto">
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="GSTIN"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedCustomer.Gstin, StringFormat=' : {0}'}"/>
-                            
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedCustomer.GSTIN, StringFormat=' : {0}'}"/>
+
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="State"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedCustomer.State, StringFormat=' : {0}'}"/>
-                            
+
                             <TextBlock Grid.Row="1" Grid.Column="2" Text="State Code: " Margin="10,0,0,0"/>
                             <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding SelectedCustomer.StateCode}"/>
                         </Grid>
@@ -69,18 +76,18 @@
                     <StackPanel Spacing="2">
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                             <TextBlock Text="Supply to party: " VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding SelectedCustomer.Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SelectedCustomer.CustomerName}" FontWeight="Bold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        
+
                         <TextBlock Text="{Binding SelectedCustomer.Address}" TextWrapping="Wrap" Margin="10,5,0,15" MinHeight="35"/>
-                        
+
                         <Grid ColumnDefinitions="Auto, *, Auto, Auto" RowDefinitions="Auto, Auto">
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="GSTIN"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedCustomer.Gstin, StringFormat=' : {0}'}"/>
-                            
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedCustomer.GSTIN, StringFormat=' : {0}'}"/>
+
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="State"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedCustomer.State, StringFormat=' : {0}'}"/>
-                            
+
                             <TextBlock Grid.Row="1" Grid.Column="2" Text="State Code: " Margin="10,0,0,0"/>
                             <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding SelectedCustomer.StateCode}"/>
                         </Grid>
@@ -97,18 +104,19 @@
                     <!-- Items DataGrid or List -->
                     <DataGrid ItemsSource="{Binding InvoiceItems}" AutoGenerateColumns="False" IsReadOnly="False" Height="200">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Product Description" Binding="{Binding ProductName}" Width="*"/>
+                            <DataGridTextColumn Header="S. No" Binding="{Binding SNo}" Width="50" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Product Description" Binding="{Binding ProductDescription}" Width="*"/>
                             <DataGridTextColumn Header="FIT" Binding="{Binding Fit}" Width="80"/>
                             <DataGridTextColumn Header="SIZE" Binding="{Binding Size}" Width="80"/>
                             <DataGridTextColumn Header="HSN" Binding="{Binding Hsn}" Width="80"/>
-                            <DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="60"/>
+                            <DataGridTextColumn Header="QTY" Binding="{Binding Qty}" Width="60"/>
                             <DataGridTextColumn Header="UOM" Binding="{Binding Uom}" Width="60"/>
                             <DataGridTextColumn Header="Rate" Binding="{Binding Rate}" Width="80"/>
                             <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    
-                    <Button Content="Add Item" Command="{Binding AddItemCommand}"/>
+
+                    <Button Content="Add Item" Command="{Binding AddRowCommand}"/>
                 </StackPanel>
             </Border>
 
@@ -117,13 +125,22 @@
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="{Binding AmountInWords, StringFormat='Rupees in words: {0}'}" FontStyle="Italic"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="2" Width="250">
+                <StackPanel Grid.Column="1" Spacing="6" Width="250">
                     <TextBlock Text="{Binding TotalAmount, StringFormat='Total Amount: {0:C}'}" FontWeight="Bold" HorizontalAlignment="Right"/>
-                    <Button Content="Save &amp; Preview Invoice" Command="{Binding SaveInvoiceCommand}" HorizontalAlignment="Stretch"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button Content="Preview" Width="120" Click="PreviewButton_Click"/>
+                        <Button Content="Save Invoice" Command="{Binding SaveInvoiceCommand}" Width="120"/>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
 
         </StackPanel>
-    </ScrollViewer>
+</ScrollViewer>
+
+        <!-- Inline preview area; shown when the viewmodel sets IsPreviewVisible -->
+        <ContentControl Grid.Row="1" IsVisible="{Binding IsPreviewVisible}">
+            <vm:InvoicePreviewView DataContext="{Binding}"/>
+        </ContentControl>
+    </Grid>
 
 </UserControl>

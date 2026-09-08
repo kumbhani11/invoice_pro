@@ -27,6 +27,20 @@
                       AutoGenerateColumns="False" IsReadOnly="True"
                       BorderThickness="0" Background="White">
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Actions" Width="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Button Content="✏" ToolTip.Tip="Edit" Width="36"
+                                            Command="{Binding DataContext.EditCustomerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                    <Button Content="🗑" ToolTip.Tip="Delete" Width="36" Classes="Danger"
+                                            Command="{Binding DataContext.DeleteCustomerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Name"   Binding="{Binding Name}"   Width="*"/>
                     <DataGridTextColumn Header="GSTIN"  Binding="{Binding GSTIN}"  Width="150"/>
                     <DataGridTextColumn Header="Phone"  Binding="{Binding Phone}"  Width="120"/>
@@ -44,27 +58,27 @@
                         <TextBlock Text="Customer Details" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
 
                         <TextBlock Text="Name *"/>
-                        <TextBox Text="{Binding CurrentCustomer.Name}"/>
+                        <TextBox Text="{Binding CurrentCustomer.Name, Mode=TwoWay}"/>
 
                         <TextBlock Text="GSTIN" Margin="0,4,0,0"/>
-                        <TextBox Text="{Binding CurrentCustomer.GSTIN}"/>
+                        <TextBox Text="{Binding CurrentCustomer.GSTIN, Mode=TwoWay}"/>
 
                         <TextBlock Text="Phone" Margin="0,4,0,0"/>
-                        <TextBox Text="{Binding CurrentCustomer.Phone}"/>
+                        <TextBox Text="{Binding CurrentCustomer.Phone, Mode=TwoWay}"/>
 
                         <TextBlock Text="Address" Margin="0,4,0,0"/>
-                        <TextBox Text="{Binding CurrentCustomer.Address}"
+                        <TextBox Text="{Binding CurrentCustomer.Address, Mode=TwoWay}"
                                  Height="52" AcceptsReturn="True" TextWrapping="Wrap"/>
 
                         <TextBlock Text="State" Margin="0,4,0,0"/>
-                        <TextBox Text="{Binding CurrentCustomer.State}"/>
+                        <TextBox Text="{Binding CurrentCustomer.State, Mode=TwoWay}"/>
 
                         <TextBlock Text="State Code" Margin="0,4,0,0"/>
-                        <TextBox Text="{Binding CurrentCustomer.StateCode}"/>
+                        <TextBox Text="{Binding CurrentCustomer.StateCode, Mode=TwoWay}"/>
 
                         <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,10,0,0" HorizontalAlignment="Right">
                             <Button Content="Cancel" Command="{Binding CancelEditCommand}"/>
-                            <Button Content="Save"   Command="{Binding SaveAsyncCommand}" Classes="Success"/>
+                            <Button Content="Save"   Command="{Binding SaveCommand}" Classes="Success"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

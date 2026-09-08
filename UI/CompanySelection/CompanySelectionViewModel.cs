@@ -15,10 +15,12 @@ namespace InvoicePro.UI.CompanySelection;
 public partial class CompanySelectionViewModel : ViewModelBase
 {
     private readonly Window _startupWindow;
+    private readonly bool _createMainWindowOnSelect;
 
-    public CompanySelectionViewModel(Window startupWindow)
+    public CompanySelectionViewModel(Window startupWindow, bool createMainWindowOnSelect = true)
     {
         _startupWindow = startupWindow;
+        _createMainWindowOnSelect = createMainWindowOnSelect;
     }
 
     private static string GetAppFolder()
@@ -58,12 +60,20 @@ public partial class CompanySelectionViewModel : ViewModelBase
             SessionContext.CurrentCompany = company;
         }
 
-        var mainVm = new MainViewModel(companyName);
         NavigationService.SetCompany?.Invoke(SessionContext.CurrentCompany?.Name ?? companyName);
         NavigationService.SetStatus?.Invoke("Ready");
 
-        var mainWindow = new MainWindow { DataContext = mainVm };
-        mainWindow.Show();
-        _startupWindow.Close();
+        if (_createMainWindowOnSelect)
+        {
+            var mainVm = new MainViewModel(companyName);
+            var mainWindow = new MainWindow { DataContext = mainVm };
+            mainWindow.Show();
+            _startupWindow.Close();
+        }
+        else
+        {
+            // Close only the selection dialog; main app remains running and will react to SessionContext.CurrentCompanyChanged
+            _startupWindow.Close();
+        }
     }
 }

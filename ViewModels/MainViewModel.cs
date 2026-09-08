@@ -1,7 +1,9 @@
 using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InvoicePro.UI;
+using InvoicePro.Services;
 using InvoicePro.UI.Backup;
 using InvoicePro.UI.Bills;
 using InvoicePro.UI.Customers;
@@ -36,7 +38,27 @@ public partial class MainViewModel : ViewModelBase
         NavigationService.SetCompany    = name => CompanyName = name;
         NavigationService.SetInvoiceCount = text => InvoiceCountText = text;
         IsNewBillActive = true;
+
+        // React to global company changes
+        SessionContext.CurrentCompanyChanged += company =>
+        {
+            CompanyName = company?.Name ?? _companyName;
+            // Navigate to a fresh NewBill page for the selected company
+            Navigate(new NewBillViewModel(company?.Name ?? _selectedCompanyName));
+        };
     }
+
+    // Allow switching company via the NavigationService (MainWindow wires the UI)
+    [RelayCommand]
+    private async Task SwitchCompany()
+    {
+        if (NavigationService.OpenCompanySelection != null)
+        {
+            await NavigationService.OpenCompanySelection();
+        }
+    }
+
+    
 
     private string _selectedCompanyName = "AVANI ENTERPRISE";
 
