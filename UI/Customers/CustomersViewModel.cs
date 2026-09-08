@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using InvoicePro.Data.SQLite;
 using InvoicePro.Models;
 using InvoicePro.Services;
+using Microsoft.EntityFrameworkCore;
 using InvoicePro.ViewModels;
 
 namespace InvoicePro.UI.Customers;
@@ -27,7 +28,8 @@ public partial class CustomersViewModel : ViewModelBase
     private async Task LoadCustomersAsync()
     {
         using var db = new BillingDbContext();
-        var query = db.Customers.AsQueryable();
+        // Use AsNoTracking for read-only queries to reduce EF Core change-tracking overhead
+        var query = db.Customers.AsNoTracking().AsQueryable();
         
         if (!string.IsNullOrWhiteSpace(SearchText))
         {

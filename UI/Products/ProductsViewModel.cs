@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InvoicePro.Data.SQLite;
 using InvoicePro.Models;
+using Microsoft.EntityFrameworkCore;
 using InvoicePro.ViewModels;
 
 namespace InvoicePro.UI.Products;
@@ -26,7 +27,8 @@ public partial class ProductsViewModel : ViewModelBase
     private async Task LoadProductsAsync()
     {
         using var db = new BillingDbContext();
-        var query = db.Products.AsQueryable();
+        // Use AsNoTracking for read-only product lists to avoid unnecessary change tracking
+        var query = db.Products.AsNoTracking().AsQueryable();
         
         if (!string.IsNullOrWhiteSpace(SearchText))
         {

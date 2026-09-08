@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -21,6 +23,7 @@ public partial class NewBillViewModel : ViewModelBase
 {
     private readonly string _defaultCompanyName;
     private decimal _cgst, _sgst, _roundOff;
+    private bool _suppressInvoiceNumberChange;
 
     // ── Company & Customer ────────────────────────────────────────────────
     [ObservableProperty] private CompanyProfile _selectedCompany = new();
@@ -39,6 +42,11 @@ public partial class NewBillViewModel : ViewModelBase
     [ObservableProperty] private DateTimeOffset _invoiceDate = DateTimeOffset.Now;
     [ObservableProperty] private string _invoiceState     = string.Empty;
     [ObservableProperty] private string _invoiceStateCode = string.Empty;
+
+    // Friendly Date-only property for XAML DatePicker binding
+    [ObservableProperty] private DateTime _invoiceDateOnly = DateTime.Now;
+    // Date string property (dd/MM/yyyy) for plain-text entry binding
+    [ObservableProperty] private string _invoiceDateString = DateTime.Now.ToString("dd/MM/yyyy");
 
     // ── Transport ─────────────────────────────────────────────────────────
     [ObservableProperty] private string _reverseCharge   = "No";
@@ -92,6 +100,9 @@ public partial class NewBillViewModel : ViewModelBase
         // Reload customers when any other part of the app mutates customers
         SessionContext.CustomersChanged += async () => await LoadCustomersFromDbAsync();
         InvoiceItems.CollectionChanged += OnCollectionChanged;
+        // ensure at least one blank row is visible by default for easier data entry
+        if (InvoiceItems.Count == 0)
+            InvoiceItems.Add(new InvoiceItemModel());
         _ = LoadCompanyFromDbAsync();
     }
 
@@ -100,7 +111,8 @@ public partial class NewBillViewModel : ViewModelBase
         try
         {
             using var db = new BillingDbContext();
-            var list = await db.Customers.ToListAsync();
+            // read-only list — no tracking improves performance
+            var list = await db.Customers.AsNoTracking().ToListAsync();
             if (list != null && list.Count > 0)
             {
                 Customers = new ObservableCollection<CustomerModel>(
@@ -149,6 +161,27 @@ public partial class NewBillViewModel : ViewModelBase
                 CompanyGstin     = company.GSTIN;
                 CompanyState     = company.State;
                 CompanyStateCode = company.StateCode;
+                // Prefill invoice state values from company info (editable by user)
+                InvoiceState     = company.State ?? string.Empty;
+                InvoiceStateCode = company.StateCode ?? string.Empty;
+                InvoiceDate      = DateTimeOffset.Now;
+                InvoiceDateOnly  = InvoiceDate.DateTime;
+                // Prepare a company-prefixed invoice number: check ApplicationSettings for InvoicePrefix first
+                try
+                {
+                    using var db2 = new BillingDbContext();
+                    var prefixSetting = await db2.ApplicationSettings.FirstOrDefaultAsync(s => s.Key == "InvoicePrefix");
+                    string prefix = !string.IsNullOrWhiteSpace(prefixSetting?.Value)
+                        ? prefixSetting.Value.Trim().ToUpperInvariant()
+                        : (!string.IsNullOrWhiteSpace(company.Name) ? company.Name.Substring(0, 1).ToUpperInvariant() : "INV");
+
+                    var lastInvoice = await db2.Invoices.OrderByDescending(i => i.Id).FirstOrDefaultAsync();
+                    var nextNumber = (lastInvoice?.Id ?? 0) + 1;
+                    _suppressInvoiceNumberChange = true;
+                    InvoiceNumber = $"{prefix}-{nextNumber}";
+                    _suppressInvoiceNumberChange = false;
+                }
+                catch { /* ignore settings fetch failures */ }
                 PreviewCompanyName = company.Name;
 
                 SelectedCompany = new CompanyProfile
@@ -183,9 +216,9 @@ public partial class NewBillViewModel : ViewModelBase
     partial void OnSelectedCustomerChanged(CustomerModel? value)
     {
         if (value is null) return;
-        InvoiceState     = value.State;
-        InvoiceStateCode = value.StateCode;
-        PlaceOfSupply    = value.State;
+        // Do not override invoice-level state/statecode here; those come from company by default
+        // Keep PlaceOfSupply derived from customer when available
+        PlaceOfSupply = value.State;
     }
 
     // ── Collection wiring ─────────────────────────────────────────────────
@@ -205,6 +238,77 @@ public partial class NewBillViewModel : ViewModelBase
     {
         if (e.PropertyName is nameof(InvoiceItemModel.Amount))
             CalculateTotals();
+    }
+
+    // Keep InvoiceDateOnly and InvoiceDate in sync
+    partial void OnInvoiceDateChanged(DateTimeOffset value)
+    {
+        if (InvoiceDateOnly.Date != value.DateTime.Date)
+            InvoiceDateOnly = value.DateTime;
+        var s = value.DateTime.ToString("dd/MM/yyyy");
+        if (InvoiceDateString != s)
+            InvoiceDateString = s;
+    }
+
+    partial void OnInvoiceDateOnlyChanged(DateTime value)
+    {
+        var dto = new DateTimeOffset(value.Date);
+        if (InvoiceDate.Date != dto.Date)
+            InvoiceDate = dto;
+    }
+
+    partial void OnInvoiceDateStringChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return;
+        var txt = value.Trim();
+        // Accept only dd/MM/yyyy numeric format
+        if (DateTime.TryParseExact(txt, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+        {
+            var dto = new DateTimeOffset(dt.Date);
+            if (InvoiceDate.Date != dto.Date)
+                InvoiceDate = dto;
+            if (InvoiceDateOnly.Date != dt.Date)
+                InvoiceDateOnly = dt.Date;
+        }
+        else
+        {
+            NavigationService.SetStatus?.Invoke("Invalid date format. Use dd/MM/yyyy (e.g. 12/08/2005).");
+        }
+    }
+
+    // Validate and normalize invoice number format like "H-425" or comma-separated "H-425, A-876"
+    partial void OnInvoiceNumberChanged(string value)
+    {
+        if (_suppressInvoiceNumberChange) return;
+        if (string.IsNullOrWhiteSpace(value)) return;
+        var txt = value.Trim();
+        var parts = txt.Split(',');
+        var normalizedParts = new System.Collections.Generic.List<string>();
+        var pattern = new Regex("^([A-Za-z]+)-(\\d+)$");
+        foreach (var p in parts)
+        {
+            var t = p.Trim();
+            var m = pattern.Match(t);
+            if (m.Success)
+            {
+                var letters = m.Groups[1].Value.ToUpperInvariant();
+                var numbers = m.Groups[2].Value;
+                normalizedParts.Add($"{letters}-{numbers}");
+            }
+            else
+            {
+                NavigationService.SetStatus?.Invoke("Invoice number should be like H-425 or multiple: H-425, A-876");
+                return;
+            }
+        }
+
+        var normalized = string.Join(", ", normalizedParts);
+        if (normalized != value)
+        {
+            _suppressInvoiceNumberChange = true;
+            InvoiceNumber = normalized; // reassign to normalized form
+            _suppressInvoiceNumberChange = false;
+        }
     }
 
     private void ReindexRows()

@@ -4,143 +4,861 @@
              x:DataType="vm:NewBillViewModel"
              x:Class="InvoicePro.UI.NewBill.NewBillView">
 
-    <Grid RowDefinitions="Auto,Auto">
-        <ScrollViewer Grid.Row="0">
-        <StackPanel Margin="10" Spacing="10">
-            
-            <!-- 4-BOX HEADER SECTION -->
-            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto">
-                
-                <!-- BOX 1: TOP LEFT (Prefilled Company Info) -->
-                <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1,1,1,1" Padding="5">
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="{Binding CompanyName}" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="{Binding CompanyAddress1, StringFormat='Regd.Off: {0}'}" TextWrapping="Wrap" FontSize="12"/>
-                        <TextBlock Text="{Binding CompanyAddress2, StringFormat='Sales Office: {0}'}" TextWrapping="Wrap" FontSize="12"/>
-                        <TextBlock Text="{Binding CompanyPhone, StringFormat='Ph. {0}'}" FontSize="12"/>
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock Text="GSTIN:" FontWeight="Bold" FontSize="12"/>
-                            <TextBlock Text="{Binding CompanyGstin}" FontWeight="Bold" FontSize="12"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
+    <UserControl.Styles>
 
-                <!-- BOX 2: TOP RIGHT (Invoice Details) -->
-                <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="0,1,1,1" Padding="5">
-                    <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="INVOICE NO.:" FontWeight="Bold" Padding="0,2"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding InvoiceNumber}" FontWeight="Bold" FontSize="14" TextAlignment="Right" Padding="0,2"/>
-                        
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="DATE" FontWeight="Bold" Padding="0,2"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding InvoiceDate, StringFormat=': {0:dd/MM/yyyy}'}" FontWeight="Bold" TextAlignment="Right" Padding="0,2"/>
-                        
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="State" FontWeight="Bold" Padding="0,2"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding InvoiceState, StringFormat=': {0}'}" FontWeight="Bold" TextAlignment="Right" Padding="0,2"/>
-                        
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="State Code" FontWeight="Bold" Padding="0,2"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding InvoiceStateCode, StringFormat=': {0}'}" FontWeight="Bold" TextAlignment="Right" Padding="0,2"/>
+        <!-- Section title -->
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!-- Small invoice labels -->
+        <Style Selector="TextBlock.field-label">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Normal invoice text -->
+        <Style Selector="TextBlock.invoice-text">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Header input controls -->
+        <Style Selector="TextBox.invoice-input">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="ComboBox.customer-combo">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MinHeight" Value="30"/>
+        </Style>
+
+        <!-- Action buttons -->
+        <Style Selector="Button.action-button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+    </UserControl.Styles>
+
+
+    <!--
+        ============================================================
+        MAIN PAGE
+        ============================================================
+    -->
+
+    <Grid RowDefinitions="*">
+
+        <!-- ========================================================
+             EDITOR
+             ======================================================== -->
+
+        <ScrollViewer Grid.Row="0"
+                      IsVisible="{Binding !IsPreviewVisible}"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+
+            <StackPanel Margin="16"
+                        Spacing="10"
+                        MaxWidth="1200">
+
+
+                <!-- =================================================
+                     DOCUMENT TITLE
+                     ================================================= -->
+
+                <Grid ColumnDefinitions="*,Auto,*"
+                      Margin="0,0,0,4">
+
+                    <!-- Left spacer -->
+                    <Border Grid.Column="0"/>
+
+                    <!-- Center title -->
+                    <StackPanel Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                Spacing="1">
+
+                        <TextBlock Text="TAX INVOICE"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="GST TAX INVOICE"
+                                   FontSize="10"
+                                   HorizontalAlignment="Center"
+                                   Opacity="0.65"/>
+
+                    </StackPanel>
+
+                    <!-- Original copy -->
+                    <TextBlock Grid.Column="2"
+                               Text="Original for Recipient"
+                               FontSize="10"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Bottom"
+                               Margin="0,0,2,2"/>
+
+                </Grid>
+
+
+                <!-- =================================================
+                     SELLER + INVOICE DETAILS
+                     ================================================= -->
+
+                <Border BorderBrush="Black"
+                        BorderThickness="1"
+                        CornerRadius="2">
+
+                    <Grid ColumnDefinitions="*,*">
+
+
+                        <!-- =========================================
+                             SELLER / COMPANY INFORMATION
+                             ========================================= -->
+
+                        <Border Grid.Column="0"
+                                BorderBrush="Black"
+                                BorderThickness="0,0.0,1,0"
+                                Padding="12">
+
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+
+                                <!-- Company -->
+                                <TextBlock Grid.Row="0"
+                                           Text="{Binding CompanyName}"
+                                           FontSize="17"
+                                           FontWeight="Bold"
+                                           TextWrapping="Wrap"/>
+
+                                <!-- Registered office -->
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding CompanyAddress1, StringFormat='Regd. Office: {0}'}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"/>
+
+                                <!-- Sales office -->
+                                <TextBlock Grid.Row="2"
+                                           Text="{Binding CompanyAddress2, StringFormat='Sales Office: {0}'}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"/>
+
+                                <!-- Phone -->
+                                <TextBlock Grid.Row="3"
+                                           Text="{Binding CompanyPhone, StringFormat='Ph.: {0}'}"
+                                           FontSize="11"/>
+
+                                <!-- GSTIN -->
+                                <StackPanel Grid.Row="4"
+                                            Orientation="Horizontal"
+                                            Spacing="5"
+                                            Margin="0,2,0,0">
+
+                                    <TextBlock Text="GSTIN:"
+                                               FontSize="11"
+                                               FontWeight="Bold"/>
+
+                                    <TextBlock Text="{Binding CompanyGstin}"
+                                               FontSize="11"
+                                               FontWeight="Bold"/>
+
+                                </StackPanel>
+
+                            </Grid>
+
+                        </Border>
+
+
+                        <!-- =========================================
+                             INVOICE INFORMATION
+                             ========================================= -->
+
+                        <Border Grid.Column="1"
+                                Padding="12">
+
+                            <Grid ColumnDefinitions="105,*"
+                                  RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                <!-- Invoice No -->
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="0"
+                                           Text="INVOICE NO"
+                                           Classes="field-label"/>
+
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+
+                                    <TextBlock Text=":"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBox Text="{Binding InvoiceNumber, Mode=TwoWay}"
+                                             Classes="invoice-input"
+                                             HorizontalAlignment="Stretch"
+                                             MinWidth="160"/>
+
+                                </StackPanel>
+
+
+                                <!-- Date -->
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="0"
+                                           Text="DATE"
+                                           Classes="field-label"/>
+
+                                <StackPanel Grid.Row="1"
+                                            Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+
+                                    <TextBlock Text=":"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBox Text="{Binding InvoiceDateString, Mode=TwoWay}"
+                                             Classes="invoice-input"
+                                             Width="140"/>
+
+                                </StackPanel>
+
+
+                                <!-- State -->
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="0"
+                                           Text="STATE"
+                                           Classes="field-label"/>
+
+                                <StackPanel Grid.Row="2"
+                                            Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+
+                                    <TextBlock Text=":"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBox Text="{Binding InvoiceState, Mode=TwoWay}"
+                                             Classes="invoice-input"
+                                             Width="160"/>
+
+                                </StackPanel>
+
+
+                                <!-- State Code -->
+                                <TextBlock Grid.Row="3"
+                                           Grid.Column="0"
+                                           Text="STATE CODE"
+                                           Classes="field-label"/>
+
+                                <StackPanel Grid.Row="3"
+                                            Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+
+                                    <TextBlock Text=":"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBox Text="{Binding InvoiceStateCode, Mode=TwoWay}"
+                                             Classes="invoice-input"
+                                             Width="80"/>
+
+                                </StackPanel>
+
+                            </Grid>
+
+                        </Border>
+
                     </Grid>
+
                 </Border>
 
-                <!-- BOX 3: BOTTOM LEFT (Bill To & Customer Selection) -->
-                <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5">
-                    <StackPanel Spacing="2">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Bill to party: " VerticalAlignment="Center"/>
-                            <ComboBox ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}" Width="250" VerticalAlignment="Center">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding CustomerName}"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
+
+                <!-- =================================================
+                     BILL TO / SUPPLY TO
+                     ================================================= -->
+
+                <Grid ColumnDefinitions="*,*">
+
+
+                    <!-- =============================================
+                         BILL TO
+                         ============================================= -->
+
+                    <Border Grid.Column="0"
+                            BorderBrush="Black"
+                            BorderThickness="1"
+                            CornerRadius="2">
+
+                        <StackPanel>
+
+
+                            <!-- Section header -->
+                            <Border Background="#F2F2F2"
+                                    BorderBrush="Black"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="10,7">
+
+                                <TextBlock Text="BILL TO PARTY"
+                                           Classes="section-title"/>
+
+                            </Border>
+
+
+                            <!-- Content -->
+                            <StackPanel Margin="10"
+                                        Spacing="8">
+
+
+                                <!-- Customer -->
+                                <Grid ColumnDefinitions="80,*">
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Customer"
+                                               Classes="field-label"/>
+
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding Customers}"
+                                              SelectedItem="{Binding SelectedCustomer}"
+                                              Classes="customer-combo"
+                                              HorizontalAlignment="Stretch">
+
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding CustomerName}"
+                                                           FontSize="12"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+
+                                    </ComboBox>
+
+                                </Grid>
+
+
+                                <!-- Address -->
+                                <StackPanel Spacing="2">
+
+                                    <TextBlock Text="Address"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Text="{Binding SelectedCustomer.Address}"
+                                               Classes="invoice-text"
+                                               TextWrapping="Wrap"
+                                               MinHeight="35"/>
+
+                                </StackPanel>
+
+
+                                <!-- GSTIN / State -->
+                                <Grid ColumnDefinitions="70,*,Auto,Auto"
+                                      RowDefinitions="Auto,Auto">
+
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="0"
+                                               Text="GSTIN"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="1"
+                                               Text="{Binding SelectedCustomer.GSTIN, StringFormat=': {0}'}"
+                                               Classes="invoice-text"/>
+
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="0"
+                                               Text="State"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="1"
+                                               Text="{Binding SelectedCustomer.State, StringFormat=': {0}'}"
+                                               Classes="invoice-text"/>
+
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="2"
+                                               Text="State Code"
+                                               Classes="field-label"
+                                               Margin="10,0,0,0"/>
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="3"
+                                               Text="{Binding SelectedCustomer.StateCode}"
+                                               Classes="invoice-text"/>
+
+                                </Grid>
+
+                            </StackPanel>
+
                         </StackPanel>
-                        
-                        <TextBlock Text="{Binding SelectedCustomer.Address}" TextWrapping="Wrap" Margin="10,5,0,15" MinHeight="35"/>
-                        
-                        <Grid ColumnDefinitions="Auto, *, Auto, Auto" RowDefinitions="Auto, Auto">
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="GSTIN"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedCustomer.GSTIN, StringFormat=' : {0}'}"/>
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="State"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedCustomer.State, StringFormat=' : {0}'}"/>
+                    </Border>
 
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="State Code: " Margin="10,0,0,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding SelectedCustomer.StateCode}"/>
+
+                    <!-- =============================================
+                         SUPPLY TO
+                         ============================================= -->
+
+                    <Border Grid.Column="1"
+                            BorderBrush="Black"
+                            BorderThickness="1"
+                            CornerRadius="2">
+
+                        <StackPanel>
+
+
+                            <!-- Section header -->
+                            <Border Background="#F2F2F2"
+                                    BorderBrush="Black"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="10,7">
+
+                                <TextBlock Text="SUPPLY TO PARTY"
+                                           Classes="section-title"/>
+
+                            </Border>
+
+
+                            <!-- Content -->
+                            <StackPanel Margin="10"
+                                        Spacing="8">
+
+
+                                <!-- Customer -->
+                                <Grid ColumnDefinitions="80,*">
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Customer"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedCustomer.CustomerName}"
+                                               Classes="invoice-text"
+                                               FontWeight="Bold"/>
+
+                                </Grid>
+
+
+                                <!-- Address -->
+                                <StackPanel Spacing="2">
+
+                                    <TextBlock Text="Address"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Text="{Binding SelectedCustomer.Address}"
+                                               Classes="invoice-text"
+                                               TextWrapping="Wrap"
+                                               MinHeight="35"/>
+
+                                </StackPanel>
+
+
+                                <!-- GSTIN / State -->
+                                <Grid ColumnDefinitions="70,*,Auto,Auto"
+                                      RowDefinitions="Auto,Auto">
+
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="0"
+                                               Text="GSTIN"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="1"
+                                               Text="{Binding SelectedCustomer.GSTIN, StringFormat=': {0}'}"
+                                               Classes="invoice-text"/>
+
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="0"
+                                               Text="State"
+                                               Classes="field-label"/>
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="1"
+                                               Text="{Binding SelectedCustomer.State, StringFormat=': {0}'}"
+                                               Classes="invoice-text"/>
+
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="2"
+                                               Text="State Code"
+                                               Classes="field-label"
+                                               Margin="10,0,0,0"/>
+
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="3"
+                                               Text="{Binding SelectedCustomer.StateCode}"
+                                               Classes="invoice-text"/>
+
+                                </Grid>
+
+                            </StackPanel>
+
+                        </StackPanel>
+
+                    </Border>
+
+                </Grid>
+
+
+                <!-- =================================================
+                     PRODUCT DETAILS
+                     ================================================= -->
+
+                <Border BorderBrush="Black"
+                        BorderThickness="1"
+                        CornerRadius="2">
+
+                    <StackPanel>
+
+
+                        <!-- Section header -->
+                        <Grid ColumnDefinitions="*,Auto"
+                              Background="#F2F2F2">
+
+                            <Border Grid.Column="0"
+                                    Padding="10,7">
+
+                                <TextBlock Text="PRODUCT DETAILS"
+                                           Classes="section-title"/>
+
+                            </Border>
+
+                            <Button Grid.Column="1"
+                                    Content="+  Add Item"
+                                    Command="{Binding AddRowCommand}"
+                                    Margin="5"
+                                    Padding="12,4"/>
+
                         </Grid>
+
+
+                        <!-- Items grid -->
+                        <DataGrid Name="ItemsGrid"
+                                  ItemsSource="{Binding InvoiceItems}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  MinHeight="220"
+                                  MaxHeight="400"
+                                  Margin="0"
+                                  GridLinesVisibility="All"
+                                  BorderThickness="0">
+
+                            <DataGrid.Columns>
+
+                                <!-- S.No -->
+                                <DataGridTextColumn Header="S. No"
+                                                    Binding="{Binding SNo}"
+                                                    Width="55"
+                                                    IsReadOnly="True"/>
+
+
+                                <!-- Product -->
+                                <DataGridTemplateColumn Header="Product Description"
+                                                        Width="2*">
+
+                                    <DataGridTemplateColumn.CellTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBlock Text="{Binding ProductDescription}"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,2"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellTemplate>
+
+
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBox Text="{Binding ProductDescription, Mode=TwoWay}"
+                                                     TextWrapping="Wrap"
+                                                     Margin="2"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+
+                                </DataGridTemplateColumn>
+
+
+                                <!-- FIT -->
+                                <DataGridTextColumn Header="FIT"
+                                                    Binding="{Binding Fit}"
+                                                    Width="75"/>
+
+
+                                <!-- SIZE -->
+                                <DataGridTextColumn Header="SIZE"
+                                                    Binding="{Binding Size}"
+                                                    Width="70"/>
+
+
+                                <!-- HSN -->
+                                <DataGridTextColumn Header="HSN"
+                                                    Binding="{Binding Hsn}"
+                                                    Width="85"/>
+
+
+                                <!-- QTY -->
+                                <DataGridTemplateColumn Header="QTY"
+                                                        Width="70">
+
+                                    <DataGridTemplateColumn.CellTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBlock Text="{Binding Qty}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,0"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellTemplate>
+
+
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBox Text="{Binding Qty, Mode=TwoWay}"
+                                                     HorizontalContentAlignment="Right"
+                                                     Margin="2"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+
+                                </DataGridTemplateColumn>
+
+
+                                <!-- UOM -->
+                                <DataGridTextColumn Header="UOM"
+                                                    Binding="{Binding Uom}"
+                                                    Width="65"/>
+
+
+                                <!-- RATE -->
+                                <DataGridTemplateColumn Header="RATE"
+                                                        Width="90">
+
+                                    <DataGridTemplateColumn.CellTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBlock Text="{Binding Rate, StringFormat='{}{0:F2}'}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,0"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellTemplate>
+
+
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBox Text="{Binding Rate, Mode=TwoWay}"
+                                                     HorizontalContentAlignment="Right"
+                                                     Margin="2"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+
+                                </DataGridTemplateColumn>
+
+
+                                <!-- AMOUNT -->
+                                <DataGridTemplateColumn Header="AMOUNT"
+                                                        Width="110">
+
+                                    <DataGridTemplateColumn.CellTemplate>
+
+                                        <DataTemplate>
+
+                                            <TextBlock Text="{Binding Amount, StringFormat='{}{0:F2}'}"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       FontWeight="SemiBold"
+                                                       Margin="5,0"/>
+
+                                        </DataTemplate>
+
+                                    </DataGridTemplateColumn.CellTemplate>
+
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+
                     </StackPanel>
+
                 </Border>
 
-                <!-- BOX 4: BOTTOM RIGHT (Supply To - Auto-fills) -->
-                <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="5">
-                    <StackPanel Spacing="2">
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                            <TextBlock Text="Supply to party: " VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding SelectedCustomer.CustomerName}" FontWeight="Bold" VerticalAlignment="Center"/>
+
+                <!-- =================================================
+                     TOTAL / AMOUNT IN WORDS
+                     ================================================= -->
+
+                <Grid ColumnDefinitions="*,Auto"
+                      Margin="0,5,0,0">
+
+
+                    <!-- Amount in words -->
+                    <Border Grid.Column="0"
+                            BorderBrush="Black"
+                            BorderThickness="1"
+                            Padding="10"
+                            Margin="0,0,10,0">
+
+                        <StackPanel Spacing="4">
+
+                            <TextBlock Text="AMOUNT IN WORDS"
+                                       Classes="section-title"/>
+
+                            <TextBlock Text="{Binding AmountInWords}"
+                                       FontSize="11"
+                                       FontStyle="Italic"
+                                       TextWrapping="Wrap"/>
+
                         </StackPanel>
 
-                        <TextBlock Text="{Binding SelectedCustomer.Address}" TextWrapping="Wrap" Margin="10,5,0,15" MinHeight="35"/>
+                    </Border>
 
-                        <Grid ColumnDefinitions="Auto, *, Auto, Auto" RowDefinitions="Auto, Auto">
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="GSTIN"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedCustomer.GSTIN, StringFormat=' : {0}'}"/>
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="State"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedCustomer.State, StringFormat=' : {0}'}"/>
+                    <!-- Total -->
+                    <Border Grid.Column="1"
+                            BorderBrush="Black"
+                            BorderThickness="1"
+                            MinWidth="260"
+                            Padding="12">
 
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="State Code: " Margin="10,0,0,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding SelectedCustomer.StateCode}"/>
-                        </Grid>
+                        <StackPanel Spacing="8">
+
+                            <Grid ColumnDefinitions="*,Auto">
+
+                                <TextBlock Grid.Column="0"
+                                           Text="TOTAL AMOUNT"
+                                           FontWeight="Bold"
+                                           FontSize="12"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TotalAmount, StringFormat='₹ {0:F2}'}"
+                                           FontWeight="Bold"
+                                           FontSize="15"
+                                           HorizontalAlignment="Right"/>
+
+                            </Grid>
+
+                        </StackPanel>
+
+                    </Border>
+
+                </Grid>
+
+
+                <!-- =================================================
+                     ACTIONS
+                     ================================================= -->
+
+                <Grid ColumnDefinitions="*,Auto"
+                      Margin="0,4,0,10">
+
+                    <!-- Left spacer -->
+                    <Border Grid.Column="0"/>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="8">
+
+                        <Button Content="Preview"
+                                Classes="action-button"
+                                Width="120"
+                                Click="PreviewButton_Click"/>
+
+                        <Button Content="Save Invoice"
+                                Classes="action-button"
+                                Width="140"
+                                Command="{Binding SaveInvoiceCommand}"/>
+
                     </StackPanel>
+
+                </Grid>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+
+        <!-- ========================================================
+             INVOICE PREVIEW
+             ======================================================== -->
+
+        <Border Grid.Row="0"
+                IsVisible="{Binding IsPreviewVisible}"
+                Background="#F5F5F5"
+                Padding="15">
+
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Preview toolbar -->
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*,Auto"
+                      Margin="0,0,0,10">
+
+                    <TextBlock Grid.Column="0"
+                               Text="Invoice Preview"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1"
+                            Content="Back to Edit"
+                            Padding="18,7"
+                            Click="PreviewButton_Click"/>
+
+                </Grid>
+
+
+                <!-- Actual invoice -->
+                <Border Grid.Row="1"
+                        Background="White"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="1"
+                        Padding="15"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top">
+
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+
+                        <vm:InvoicePreviewView DataContext="{Binding}"/>
+
+                    </ScrollViewer>
+
                 </Border>
 
             </Grid>
 
-            <!-- PRODUCT DETAILS / ITEMS SECTION -->
-            <Border BorderBrush="Black" BorderThickness="1,0,1,1" Padding="5">
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Product Details" FontWeight="Bold"/>
-                    
-                    <!-- Items DataGrid or List -->
-                    <DataGrid ItemsSource="{Binding InvoiceItems}" AutoGenerateColumns="False" IsReadOnly="False" Height="200">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="S. No" Binding="{Binding SNo}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Product Description" Binding="{Binding ProductDescription}" Width="*"/>
-                            <DataGridTextColumn Header="FIT" Binding="{Binding Fit}" Width="80"/>
-                            <DataGridTextColumn Header="SIZE" Binding="{Binding Size}" Width="80"/>
-                            <DataGridTextColumn Header="HSN" Binding="{Binding Hsn}" Width="80"/>
-                            <DataGridTextColumn Header="QTY" Binding="{Binding Qty}" Width="60"/>
-                            <DataGridTextColumn Header="UOM" Binding="{Binding Uom}" Width="60"/>
-                            <DataGridTextColumn Header="Rate" Binding="{Binding Rate}" Width="80"/>
-                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="100"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+        </Border>
 
-                    <Button Content="Add Item" Command="{Binding AddRowCommand}"/>
-                </StackPanel>
-            </Border>
-
-            <!-- TOTALS & ACTIONS SECTION -->
-            <Grid ColumnDefinitions="*, Auto">
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="{Binding AmountInWords, StringFormat='Rupees in words: {0}'}" FontStyle="Italic"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="6" Width="250">
-                    <TextBlock Text="{Binding TotalAmount, StringFormat='Total Amount: {0:C}'}" FontWeight="Bold" HorizontalAlignment="Right"/>
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <Button Content="Preview" Width="120" Click="PreviewButton_Click"/>
-                        <Button Content="Save Invoice" Command="{Binding SaveInvoiceCommand}" Width="120"/>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-
-        </StackPanel>
-</ScrollViewer>
-
-        <!-- Inline preview area; shown when the viewmodel sets IsPreviewVisible -->
-        <ContentControl Grid.Row="1" IsVisible="{Binding IsPreviewVisible}">
-            <vm:InvoicePreviewView DataContext="{Binding}"/>
-        </ContentControl>
     </Grid>
 
 </UserControl>
