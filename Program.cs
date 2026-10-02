@@ -1,5 +1,6 @@
 using Avalonia;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,12 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        var indianCulture = new CultureInfo("en-IN");
+        CultureInfo.CurrentCulture = indianCulture;
+        CultureInfo.CurrentUICulture = indianCulture;
+        CultureInfo.DefaultThreadCurrentCulture = indianCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = indianCulture;
+
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

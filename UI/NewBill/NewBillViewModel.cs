@@ -36,6 +36,20 @@ public partial class NewBillViewModel : ViewModelBase
     [ObservableProperty] private string _companyStateCode = string.Empty;
     [ObservableProperty] private ObservableCollection<CustomerModel> _customers = new();
     [ObservableProperty] private CustomerModel? _selectedCustomer;
+    [ObservableProperty] private CustomerModel? _supplyToCustomer;
+    [ObservableProperty] private bool _useSameCustomer;
+
+    [ObservableProperty] private string _billToName = string.Empty;
+    [ObservableProperty] private string _billToAddress = string.Empty;
+    [ObservableProperty] private string _billToGstin = string.Empty;
+    [ObservableProperty] private string _billToState = string.Empty;
+    [ObservableProperty] private string _billToStateCode = string.Empty;
+
+    [ObservableProperty] private string _supplyToName = string.Empty;
+    [ObservableProperty] private string _supplyToAddress = string.Empty;
+    [ObservableProperty] private string _supplyToGstin = string.Empty;
+    [ObservableProperty] private string _supplyToState = string.Empty;
+    [ObservableProperty] private string _supplyToStateCode = string.Empty;
 
     // ── Invoice info ──────────────────────────────────────────────────────
     [ObservableProperty] private string _invoiceNumber   = $"INV-{DateTime.Now:yyMMddHHmmss}";
@@ -82,6 +96,12 @@ public partial class NewBillViewModel : ViewModelBase
     [ObservableProperty] private string _previewAmountInWords = string.Empty;
     [ObservableProperty] private string _previewGstLabel      = string.Empty;
 
+    public string AmountInWords
+    {
+        get => PreviewAmountInWords;
+        set => PreviewAmountInWords = value;
+    }
+
     // Line items
     public ObservableCollection<InvoiceItemModel> InvoiceItems { get; } = new();
 
@@ -105,6 +125,7 @@ public partial class NewBillViewModel : ViewModelBase
         if (InvoiceItems.Count == 0)
             InvoiceItems.Add(new InvoiceItemModel());
         _ = LoadCompanyFromDbAsync();
+        UseSameCustomer = true;
     }
 
     private async Task LoadCustomersFromDbAsync()
@@ -216,10 +237,53 @@ public partial class NewBillViewModel : ViewModelBase
     // ── Auto-fill when customer is selected ───────────────────────────────
     partial void OnSelectedCustomerChanged(CustomerModel? value)
     {
-        if (value is null) return;
-        // Do not override invoice-level state/statecode here; those come from company by default
-        // Keep PlaceOfSupply derived from customer when available
+        if (value is null)
+        {
+            BillToName = string.Empty;
+            BillToAddress = string.Empty;
+            BillToGstin = string.Empty;
+            BillToState = string.Empty;
+            BillToStateCode = string.Empty;
+            return;
+        }
+
+        BillToName = value.CustomerName;
+        BillToAddress = value.Address;
+        BillToGstin = value.GSTIN;
+        BillToState = value.State;
+        BillToStateCode = value.StateCode;
+
+        if (UseSameCustomer || SupplyToCustomer is null)
+            SupplyToCustomer = value;
+
         PlaceOfSupply = value.State;
+    }
+
+    partial void OnSupplyToCustomerChanged(CustomerModel? value)
+    {
+        if (value is null)
+        {
+            SupplyToName = string.Empty;
+            SupplyToAddress = string.Empty;
+            SupplyToGstin = string.Empty;
+            SupplyToState = string.Empty;
+            SupplyToStateCode = string.Empty;
+            return;
+        }
+
+        SupplyToName = value.CustomerName;
+        SupplyToAddress = value.Address;
+        SupplyToGstin = value.GSTIN;
+        SupplyToState = value.State;
+        SupplyToStateCode = value.StateCode;
+    }
+
+    partial void OnUseSameCustomerChanged(bool value)
+    {
+        if (value && SelectedCustomer is not null)
+        {
+            SupplyToCustomer = SelectedCustomer;
+        }
     }
 
     // ── Collection wiring ─────────────────────────────────────────────────
@@ -324,30 +388,34 @@ public partial class NewBillViewModel : ViewModelBase
 
     private void CalculateTotals()
     {
-        SubTotal = InvoiceItems.Sum(r => r.Amount);
-        decimal taxable  = Math.Max(SubTotal - DiscountAmount, 0);
-        decimal halfRate = GstPercentage / 2m;
-        _cgst    = Math.Round(taxable * halfRate / 100m, 2);
-        _sgst    = _cgst;
-        TaxTotal = _cgst + _sgst;
-        decimal total = taxable + TaxTotal;
-        GrandTotal = Math.Round(total, 0, MidpointRounding.AwayFromZero);
-        _roundOff  = GrandTotal - total;
+        var result = InvoiceCalculationService.Calculate(
+            InvoiceItems.Select(item => new InvoiceLineItemInput { Quantity = item.Qty, Rate = item.Rate }),
+            DiscountAmount,
+            GstPercentage,
+            isInterState: false);
 
-        TotalQuantity        = (int)InvoiceItems.Sum(r => r.Qty);
-        TaxableAmount        = taxable;
-        CgstAmount           = _cgst;
-        SgstAmount           = _sgst;
-        RoundOffAmount       = _roundOff;
-        PreviewCgstRate      = halfRate.ToString("0.#");
-        PreviewCgstAmount    = _cgst.ToString("F2");
-        PreviewSgstRate      = halfRate.ToString("0.#");
-        PreviewSgstAmount    = _sgst.ToString("F2");
-        PreviewIgstRate      = string.Empty;
-        PreviewIgstAmount    = string.Empty;
-        PreviewGstLabel      = $"GST {GstPercentage:0.#}%";
-        TotalAmount          = GrandTotal;
-        PreviewAmountInWords = NumberToWordsConverter.ConvertAmount(GrandTotal);
+        SubTotal = result.SubTotal;
+        TotalQuantity = (int)InvoiceItems.Sum(r => r.Qty);
+        TaxableAmount = result.TaxableAmount;
+        CgstAmount = result.CgstAmount;
+        SgstAmount = result.SgstAmount;
+        _cgst = result.CgstAmount;
+        _sgst = result.SgstAmount;
+        _roundOff = result.RoundOffAmount;
+        TaxTotal = result.TaxTotal;
+        GrandTotal = result.GrandTotal;
+        RoundOffAmount = result.RoundOffAmount;
+        TotalAmount = result.GrandTotal;
+
+        PreviewCgstRate = (GstPercentage / 2m).ToString("0.#");
+        PreviewCgstAmount = result.CgstAmount.ToString("F2");
+        PreviewSgstRate = (GstPercentage / 2m).ToString("0.#");
+        PreviewSgstAmount = result.SgstAmount.ToString("F2");
+        PreviewIgstRate = string.Empty;
+        PreviewIgstAmount = string.Empty;
+        PreviewGstLabel = $"GST {GstPercentage:0.#}%";
+        PreviewAmountInWords = NumberToWordsConverter.ConvertAmount(result.GrandTotal);
+        AmountInWords = PreviewAmountInWords;
     }
 
     partial void OnGrandTotalChanged(decimal value)
@@ -379,12 +447,12 @@ public partial class NewBillViewModel : ViewModelBase
             {
                 InvoiceNumber     = InvoiceNumber,
                 InvoiceDate       = InvoiceDate.DateTime,
-                CustomerName      = SelectedCustomer?.CustomerName ?? "Cash Customer",
-                CustomerGSTIN     = SelectedCustomer?.GSTIN        ?? "",
+                CustomerName      = string.IsNullOrWhiteSpace(BillToName) ? (SelectedCustomer?.CustomerName ?? "Cash Customer") : BillToName,
+                CustomerGSTIN     = string.IsNullOrWhiteSpace(BillToGstin) ? (SelectedCustomer?.GSTIN ?? "") : BillToGstin,
                 CustomerPhone     = "",
-                CustomerAddress   = SelectedCustomer?.Address      ?? "",
-                CustomerState     = SelectedCustomer?.State        ?? "",
-                CustomerStateCode = SelectedCustomer?.StateCode    ?? "",
+                CustomerAddress   = string.IsNullOrWhiteSpace(BillToAddress) ? (SelectedCustomer?.Address ?? "") : BillToAddress,
+                CustomerState     = string.IsNullOrWhiteSpace(BillToState) ? (SelectedCustomer?.State ?? "") : BillToState,
+                CustomerStateCode = string.IsNullOrWhiteSpace(BillToStateCode) ? (SelectedCustomer?.StateCode ?? "") : BillToStateCode,
                 TotalQuantity     = (int)InvoiceItems.Sum(r => r.Qty),
                 GrossAmount       = SubTotal,
                 Discount          = DiscountAmount,
@@ -394,6 +462,7 @@ public partial class NewBillViewModel : ViewModelBase
                 IGST              = 0,
                 RoundOff          = _roundOff,
                 NetAmount         = GrandTotal,
+                PrintedAmountInWords = PreviewAmountInWords,
                 IsCancelled       = false
             };
 

@@ -28,7 +28,7 @@ _ReSharper*/
 **/publish_software/**
 # Rider
 .idea/
-
+.amazonq/**
 # SQLite databases
 *.db
 *.db-shm
