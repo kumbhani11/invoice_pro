@@ -41,11 +41,12 @@
         <!-- ═══ CONTENT AREA ═══ -->
         <ContentControl Grid.Row="1" Content="{Binding CurrentPage}"/>
 
-        <!-- ═══ STATUS BAR ═══ -->
+        <!-- Shell status bar hidden when NewBill is active (view has its own complete bar) -->
         <Border Grid.Row="2" Background="#F0F0F0"
                 BorderBrush="#C0C0C0" BorderThickness="0,1,0,0"
-                Padding="0">
-            <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+                Padding="0"
+                IsVisible="{Binding !IsNewBillActive}">
+            <Grid ColumnDefinitions="*, Auto, Auto">
                 <Border Grid.Column="0" BorderBrush="#C0C0C0" BorderThickness="0,0,1,0" Padding="6,2">
                     <TextBlock Text="{Binding StatusText}" FontSize="11" VerticalAlignment="Center"/>
                 </Border>
@@ -55,11 +56,8 @@
                         <Button Content="Switch" Command="{Binding SwitchCompanyCommand}" Width="64" Height="20"/>
                     </StackPanel>
                 </Border>
-                <Border Grid.Column="2" BorderBrush="#C0C0C0" BorderThickness="0,0,1,0" Padding="10,2">
+                <Border Grid.Column="2" Padding="10,2">
                     <TextBlock Text="{Binding InvoiceCountText}" FontSize="11" VerticalAlignment="Center"/>
-                </Border>
-                <Border Grid.Column="3" Padding="10,2">
-                    <TextBlock Text="INR ₹" FontSize="11" FontFamily="{StaticResource WinFontMono}" VerticalAlignment="Center"/>
                 </Border>
             </Grid>
         </Border>

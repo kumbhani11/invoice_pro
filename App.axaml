@@ -38,7 +38,7 @@
     <SolidColorBrush x:Key="WinSidebar" Color="{StaticResource WinSidebarColor}"/>
     <SolidColorBrush x:Key="WinSidebarHover" Color="{StaticResource WinSidebarHoverColor}"/>
 
-    <FontFamily x:Key="WinFontUI">Segoe UI, Inter, Tahoma, Arial, sans-serif</FontFamily>
+    <FontFamily x:Key="WinFontUI">Segoe UI, Nirmala UI, Inter, Tahoma, Arial, sans-serif</FontFamily>
     <FontFamily x:Key="WinFontMono">Consolas, 'Courier New', monospace</FontFamily>
   </Application.Resources>
 

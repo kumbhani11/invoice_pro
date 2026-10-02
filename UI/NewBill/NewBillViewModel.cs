@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -67,6 +68,15 @@ public partial class NewBillViewModel : ViewModelBase
     [ObservableProperty] private string _transportName   = string.Empty;
     [ObservableProperty] private DateTimeOffset _dateOfSupply = DateTimeOffset.Now;
     [ObservableProperty] private string _placeOfSupply   = string.Empty;
+
+    // ── Inter-state flag (drives CGST+SGST vs IGST) ──────────────────────
+    [ObservableProperty] private bool _isInterState;
+
+    // ── Status text shown in the bottom bar ──────────────────────────────
+    [ObservableProperty] private string _statusText = "Ready";
+
+    // ── Print busy guard ─────────────────────────────────────────────────
+    [ObservableProperty] private bool _isPrinting;
 
     // ── Totals ────────────────────────────────────────────────────────────
     [ObservableProperty] private decimal _discountAmount;
@@ -385,6 +395,7 @@ public partial class NewBillViewModel : ViewModelBase
     // ── Totals ────────────────────────────────────────────────────────────
     partial void OnDiscountAmountChanged(decimal value) => CalculateTotals();
     partial void OnGstPercentageChanged(decimal value)  => CalculateTotals();
+    partial void OnIsInterStateChanged(bool value)      => CalculateTotals();
 
     private void CalculateTotals()
     {
@@ -392,7 +403,7 @@ public partial class NewBillViewModel : ViewModelBase
             InvoiceItems.Select(item => new InvoiceLineItemInput { Quantity = item.Qty, Rate = item.Rate }),
             DiscountAmount,
             GstPercentage,
-            isInterState: false);
+            isInterState: IsInterState);
 
         SubTotal = result.SubTotal;
         TotalQuantity = (int)InvoiceItems.Sum(r => r.Qty);
@@ -407,12 +418,24 @@ public partial class NewBillViewModel : ViewModelBase
         RoundOffAmount = result.RoundOffAmount;
         TotalAmount = result.GrandTotal;
 
-        PreviewCgstRate = (GstPercentage / 2m).ToString("0.#");
-        PreviewCgstAmount = result.CgstAmount.ToString("F2");
-        PreviewSgstRate = (GstPercentage / 2m).ToString("0.#");
-        PreviewSgstAmount = result.SgstAmount.ToString("F2");
-        PreviewIgstRate = string.Empty;
-        PreviewIgstAmount = string.Empty;
+        if (IsInterState)
+        {
+            PreviewCgstRate   = string.Empty;
+            PreviewCgstAmount = string.Empty;
+            PreviewSgstRate   = string.Empty;
+            PreviewSgstAmount = string.Empty;
+            PreviewIgstRate   = GstPercentage.ToString("0.#");
+            PreviewIgstAmount = result.IgstAmount.ToString("F2");
+        }
+        else
+        {
+            PreviewCgstRate   = (GstPercentage / 2m).ToString("0.#");
+            PreviewCgstAmount = result.CgstAmount.ToString("F2");
+            PreviewSgstRate   = (GstPercentage / 2m).ToString("0.#");
+            PreviewSgstAmount = result.SgstAmount.ToString("F2");
+            PreviewIgstRate   = string.Empty;
+            PreviewIgstAmount = string.Empty;
+        }
         PreviewGstLabel = $"GST {GstPercentage:0.#}%";
         PreviewAmountInWords = NumberToWordsConverter.ConvertAmount(result.GrandTotal);
         AmountInWords = PreviewAmountInWords;
@@ -429,8 +452,63 @@ public partial class NewBillViewModel : ViewModelBase
     [RelayCommand] private void TogglePreview() => IsPreviewVisible = !IsPreviewVisible;
 
     // ── Row commands ──────────────────────────────────────────────────────
-    [RelayCommand] private void AddRow()    => InvoiceItems.Add(new InvoiceItemModel());
+    [RelayCommand] private void AddRow() => InvoiceItems.Add(new InvoiceItemModel());
     [RelayCommand] private void RemoveRow() { if (InvoiceItems.Count > 0) InvoiceItems.RemoveAt(InvoiceItems.Count - 1); }
+
+    [RelayCommand]
+    private void DeleteRow(InvoiceItemModel? row)
+    {
+        if (row != null) InvoiceItems.Remove(row);
+    }
+
+    // ── Print (validate → save → PDF → print) ────────────────────────────
+    // The code-behind wires the actual PDF/print step via PrintRequested.
+    public Func<Task>? PrintRequested { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanPrint))]
+    private async Task PrintAsync()
+    {
+        if (!ValidateForPrint()) return;
+        IsPrinting = true;
+        PrintCommand.NotifyCanExecuteChanged();
+        try
+        {
+            StatusText = "Saving…";
+            await SaveInvoiceAsync();
+            StatusText = "Preparing PDF…";
+            if (PrintRequested != null)
+                await PrintRequested.Invoke();
+            StatusText = "Printing…";
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            IsPrinting = false;
+            PrintCommand.NotifyCanExecuteChanged();
+            if (StatusText == "Printing…") StatusText = "Ready";
+        }
+    }
+
+    private bool CanPrint() => !IsPrinting;
+
+    private bool ValidateForPrint()
+    {
+        var filled = InvoiceItems.Where(r => r.Rate > 0 || !string.IsNullOrWhiteSpace(r.ProductDescription)).ToList();
+        if (filled.Count == 0)
+        {
+            StatusText = "Add at least one product row before printing.";
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(InvoiceNumber))
+        {
+            StatusText = "Invoice number is required.";
+            return false;
+        }
+        return true;
+    }
 
     // ── Save & Print ──────────────────────────────────────────────────────
     [RelayCommand]
@@ -488,9 +566,7 @@ public partial class NewBillViewModel : ViewModelBase
             await db.SaveChangesAsync();
             await tx.CommitAsync();
 
-            // Do not generate PDF here — use in-app preview instead.
-            IsPreviewVisible = true;
-            NavigationService.SetStatus?.Invoke($"Invoice {invoice.InvoiceNumber} saved. Preview available.");
+            NavigationService.SetStatus?.Invoke($"Invoice {invoice.InvoiceNumber} saved.");
         }
         catch
         {
