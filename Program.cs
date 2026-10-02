@@ -1,8 +1,10 @@
 using Avalonia;
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
+using InvoicePro.Data.SQLite;
 
 namespace InvoicePro;
 
@@ -15,6 +17,11 @@ sealed class Program
     public static void Main(string[] args)
     {
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var appFolder = Path.Combine(appData, "InvoicePro");
+        Directory.CreateDirectory(appFolder);
+        BillingDbContext.CurrentDatabasePath = Path.Combine(appFolder, "billing.db");
 
         var runTests = Environment.GetEnvironmentVariable("INVOICEPRO_RUN_TESTS");
         if (!string.IsNullOrEmpty(runTests) && runTests != "0")

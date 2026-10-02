@@ -9,7 +9,8 @@
         <!-- Section title -->
         <Style Selector="TextBlock.section-title">
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#1F2937"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
@@ -17,19 +18,21 @@
         <Style Selector="TextBlock.field-label">
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#4B5563"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Normal invoice text -->
         <Style Selector="TextBlock.invoice-text">
             <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#2C3440"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Header input controls -->
         <Style Selector="TextBox.invoice-input">
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="Padding" Value="8,6"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
@@ -60,22 +63,25 @@
              EDITOR
              ======================================================== -->
 
-        <ScrollViewer Grid.Row="0"
-                      IsVisible="{Binding !IsPreviewVisible}"
-                      HorizontalScrollBarVisibility="Disabled"
-                      VerticalScrollBarVisibility="Auto">
+        <Grid Grid.Row="0"
+              IsVisible="{Binding !IsPreviewVisible}"
+              ColumnDefinitions="*, 290"
+              Margin="10">
 
-            <StackPanel Margin="16"
-                        Spacing="10"
-                        MaxWidth="1200">
+            <ScrollViewer Grid.Column="0"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+
+                <StackPanel Spacing="10"
+                            MaxWidth="1200">
 
 
-                <!-- =================================================
-                     DOCUMENT TITLE
-                     ================================================= -->
+                    <!-- =================================================
+                         DOCUMENT TITLE
+                         ================================================= -->
 
-                <Grid ColumnDefinitions="*,Auto,*"
-                      Margin="0,0,0,4">
+                    <Grid ColumnDefinitions="*,Auto,*"
+                          Margin="0,0,0,4">
 
                     <!-- Left spacer -->
                     <Border Grid.Column="0"/>
@@ -108,13 +114,13 @@
                 </Grid>
 
 
-                <!-- =================================================
-                     SELLER + INVOICE DETAILS
-                     ================================================= -->
+                    <!-- =================================================
+                         SELLER + INVOICE DETAILS
+                         ================================================= -->
 
-                <Border BorderBrush="Black"
-                        BorderThickness="1"
-                        CornerRadius="2">
+                    <Border BorderBrush="Black"
+                            BorderThickness="1"
+                            CornerRadius="2">
 
                     <Grid ColumnDefinitions="*,*">
 
@@ -282,11 +288,11 @@
                 </Border>
 
 
-                <!-- =================================================
-                     BILL TO / SUPPLY TO
-                     ================================================= -->
+                    <!-- =================================================
+                         BILL TO / SUPPLY TO
+                         ================================================= -->
 
-                <Grid ColumnDefinitions="*,*">
+                    <Grid ColumnDefinitions="*,*">
 
 
                     <!-- =============================================
@@ -509,13 +515,13 @@
                 </Grid>
 
 
-                <!-- =================================================
-                     PRODUCT DETAILS
-                     ================================================= -->
+                    <!-- =================================================
+                         PRODUCT DETAILS
+                         ================================================= -->
 
-                <Border BorderBrush="Black"
-                        BorderThickness="1"
-                        CornerRadius="2">
+                    <Border BorderBrush="Black"
+                            BorderThickness="1"
+                            CornerRadius="2">
 
                     <StackPanel>
 
@@ -713,12 +719,12 @@
                 </Border>
 
 
-                <!-- =================================================
-                     TOTAL / AMOUNT IN WORDS
-                     ================================================= -->
+                    <!-- =================================================
+                         TOTAL / AMOUNT IN WORDS
+                         ================================================= -->
 
-                <Grid ColumnDefinitions="*,Auto"
-                      Margin="0,5,0,0">
+                    <Grid ColumnDefinitions="*,Auto"
+                          Margin="0,5,0,0">
 
 
                     <!-- Amount in words -->
@@ -774,12 +780,12 @@
                 </Grid>
 
 
-                <!-- =================================================
-                     ACTIONS
-                     ================================================= -->
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
 
-                <Grid ColumnDefinitions="*,Auto"
-                      Margin="0,4,0,10">
+                    <Grid ColumnDefinitions="*,Auto"
+                          Margin="0,4,0,10">
 
                     <!-- Left spacer -->
                     <Border Grid.Column="0"/>
@@ -800,11 +806,59 @@
 
                     </StackPanel>
 
-                </Grid>
+                    </Grid>
 
-            </StackPanel>
+                </StackPanel>
 
-        </ScrollViewer>
+            </ScrollViewer>
+
+            <Border Grid.Column="1"
+                    BorderBrush="#C7C7C7"
+                    BorderThickness="1"
+                    Background="#F9F9F9"
+                    CornerRadius="6"
+                    Padding="12"
+                    VerticalAlignment="Top">
+
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Bill Summary"
+                               FontSize="18"
+                               FontWeight="Bold"/>
+
+                    <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Subtotal" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SubTotal, StringFormat='₹ {0:F2}'}" HorizontalAlignment="Right"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Discount" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DiscountAmount, StringFormat='₹ {0:F2}'}" HorizontalAlignment="Right"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Tax" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TaxTotal, StringFormat='₹ {0:F2}'}" HorizontalAlignment="Right"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Round Off" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding RoundOffAmount, StringFormat='₹ {0:F2}'}" HorizontalAlignment="Right"/>
+
+                        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" />
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Final Amount" FontWeight="Bold" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding TotalAmount, StringFormat='₹ {0:F2}'}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <Border Background="#EAF4FF" Padding="10" CornerRadius="4">
+                        <TextBlock Text="{Binding PreviewAmountInWords, StringFormat='In words: {0}'}"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+
+                    <Button Content="Add Item"
+                            Command="{Binding AddRowCommand}"
+                            HorizontalAlignment="Stretch"/>
+
+                    <Button Content="Save Invoice"
+                            Command="{Binding SaveInvoiceCommand}"
+                            HorizontalAlignment="Stretch"/>
+                </StackPanel>
+            </Border>
+        </Grid>
 
 
         <!-- ========================================================

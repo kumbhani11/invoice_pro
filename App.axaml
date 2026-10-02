@@ -4,208 +4,202 @@
              x:Class="InvoicePro.App"
              RequestedThemeVariant="Light">
 
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
 
-    <Application.Resources>
-        <Color x:Key="WinBgColor">#F0F0F0</Color>
-        <Color x:Key="WinPanelColor">#F5F6F7</Color>
-        <Color x:Key="WinBorderColor">#808080</Color>
-        <Color x:Key="WinBorderLightColor">#ABABAB</Color>
-        <Color x:Key="WinInputBorderColor">#7F9DB9</Color>
-        <Color x:Key="WinHighlightColor">#0078D7</Color>
-        <Color x:Key="WinSuccessColor">#217346</Color>
-        <Color x:Key="WinDangerColor">#C42B1C</Color>
-        <Color x:Key="WinMutedColor">#666666</Color>
+  <Application.Resources>
+    <!-- InvoicePro design tokens -->
+    <Color x:Key="WinBgColor">#F4F7FB</Color>
+    <Color x:Key="WinPanelColor">#FFFFFF</Color>
+    <Color x:Key="WinBorderColor">#E2E8F0</Color>
+    <Color x:Key="WinBorderLightColor">#EDF1F6</Color>
+    <Color x:Key="WinInputBorderColor">#CBD5E1</Color>
+    <Color x:Key="WinHighlightColor">#2563EB</Color>
+    <Color x:Key="WinSuccessColor">#15803D</Color>
+    <Color x:Key="WinDangerColor">#DC2626</Color>
+    <Color x:Key="WinWarningColor">#D97706</Color>
+    <Color x:Key="WinMutedColor">#64748B</Color>
+    <Color x:Key="WinTextColor">#17243A</Color>
+    <Color x:Key="WinSidebarColor">#17243A</Color>
+    <Color x:Key="WinSidebarHoverColor">#263B59</Color>
 
-        <SolidColorBrush x:Key="WinBg"           Color="{StaticResource WinBgColor}"/>
-        <SolidColorBrush x:Key="WinPanel"         Color="{StaticResource WinPanelColor}"/>
-        <SolidColorBrush x:Key="WinBorder"        Color="{StaticResource WinBorderColor}"/>
-        <SolidColorBrush x:Key="WinBorderLight"   Color="{StaticResource WinBorderLightColor}"/>
-        <SolidColorBrush x:Key="WinInputBorder"   Color="{StaticResource WinInputBorderColor}"/>
-        <SolidColorBrush x:Key="WinHighlight"     Color="{StaticResource WinHighlightColor}"/>
-        <SolidColorBrush x:Key="WinSuccess"       Color="{StaticResource WinSuccessColor}"/>
-        <SolidColorBrush x:Key="WinDanger"        Color="{StaticResource WinDangerColor}"/>
-        <SolidColorBrush x:Key="WinMuted"         Color="{StaticResource WinMutedColor}"/>
-        <SolidColorBrush x:Key="AppTextColor">#1A1A1A</SolidColorBrush>
+    <SolidColorBrush x:Key="WinBg" Color="{StaticResource WinBgColor}"/>
+    <SolidColorBrush x:Key="WinPanel" Color="{StaticResource WinPanelColor}"/>
+    <SolidColorBrush x:Key="WinBorder" Color="{StaticResource WinBorderColor}"/>
+    <SolidColorBrush x:Key="WinBorderLight" Color="{StaticResource WinBorderLightColor}"/>
+    <SolidColorBrush x:Key="WinInputBorder" Color="{StaticResource WinInputBorderColor}"/>
+    <SolidColorBrush x:Key="WinHighlight" Color="{StaticResource WinHighlightColor}"/>
+    <SolidColorBrush x:Key="WinSuccess" Color="{StaticResource WinSuccessColor}"/>
+    <SolidColorBrush x:Key="WinDanger" Color="{StaticResource WinDangerColor}"/>
+    <SolidColorBrush x:Key="WinWarning" Color="{StaticResource WinWarningColor}"/>
+    <SolidColorBrush x:Key="WinMuted" Color="{StaticResource WinMutedColor}"/>
+    <SolidColorBrush x:Key="AppTextColor" Color="{StaticResource WinTextColor}"/>
+    <SolidColorBrush x:Key="WinSidebar" Color="{StaticResource WinSidebarColor}"/>
+    <SolidColorBrush x:Key="WinSidebarHover" Color="{StaticResource WinSidebarHoverColor}"/>
 
-        <FontFamily x:Key="WinFontUI">Segoe UI, Tahoma, Arial, sans-serif</FontFamily>
-        <FontFamily x:Key="WinFontMono">Consolas, Courier New, monospace</FontFamily>
-    </Application.Resources>
+    <FontFamily x:Key="WinFontUI">Segoe UI, Inter, Tahoma, Arial, sans-serif</FontFamily>
+    <FontFamily x:Key="WinFontMono">Consolas, 'Courier New', monospace</FontFamily>
+  </Application.Resources>
 
-    <Application.Styles>
-        <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 
-        <!-- ── Base ── -->
-        <Style Selector="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
-            <Setter Property="FontSize" Value="12"/>
-        </Style>
+    <!-- Base typography and surfaces -->
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{StaticResource WinBg}"/>
+      <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+    </Style>
+    <Style Selector="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Foreground" Value="{StaticResource AppTextColor}"/>
+    </Style>
+    <Style Selector="Border.Card">
+      <Setter Property="Background" Value="{StaticResource WinPanel}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinBorderLight}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="18"/>
+      <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+    <Style Selector="Border.tab">
+      <Setter Property="Background" Value="#F1F5F9"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinBorder}"/>
+      <Setter Property="BorderThickness" Value="1,1,1,0"/>
+      <Setter Property="Margin" Value="2,3,0,0"/>
+      <Setter Property="CornerRadius" Value="8,8,0,0"/>
+    </Style>
+    <Style Selector="Border.tab.tabActive">
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinBorder}"/>
+      <Setter Property="Margin" Value="2,2,0,0"/>
+    </Style>
 
-        <!-- ── Standard Button ── -->
-        <Style Selector="Button">
-            <Setter Property="FontFamily"   Value="{StaticResource WinFontUI}"/>
-            <Setter Property="FontSize"     Value="12"/>
-            <Setter Property="Height"       Value="24"/>
-            <Setter Property="Padding"      Value="12,2"/>
-            <Setter Property="CornerRadius" Value="1"/>
-            <Setter Property="Background"   Value="#E1E1E1"/>
-            <Setter Property="BorderBrush"  Value="{StaticResource WinBorderLight}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-        <Style Selector="Button:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#E5F1FB"/>
-            <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
-        </Style>
-        <Style Selector="Button:pressed /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#CCE4F7"/>
-            <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
-        </Style>
+    <!-- Buttons -->
+    <Style Selector="Button">
+      <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="FontWeight" Value="Medium"/>
+      <Setter Property="MinHeight" Value="36"/>
+      <Setter Property="Padding" Value="14,8"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinBorder}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Foreground" Value="{StaticResource AppTextColor}"/>
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#F1F5F9"/>
+      <Setter Property="BorderBrush" Value="#B8C5D6"/>
+    </Style>
+    <Style Selector="Button:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#E8EEF6"/>
+      <Setter Property="BorderBrush" Value="#94A3B8"/>
+    </Style>
+    <Style Selector="Button.Primary">
+      <Setter Property="Background" Value="{StaticResource WinHighlight}"/>
+      <Setter Property="Foreground" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
+    </Style>
+    <Style Selector="Button.Primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1D4ED8"/>
+      <Setter Property="BorderBrush" Value="#1D4ED8"/>
+    </Style>
+    <Style Selector="Button.Primary:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1E40AF"/>
+      <Setter Property="BorderBrush" Value="#1E40AF"/>
+    </Style>
+    <Style Selector="Button.Success">
+      <Setter Property="Background" Value="{StaticResource WinSuccess}"/>
+      <Setter Property="Foreground" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinSuccess}"/>
+    </Style>
+    <Style Selector="Button.Success:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#166534"/>
+      <Setter Property="BorderBrush" Value="#166534"/>
+    </Style>
+    <Style Selector="Button.Danger">
+      <Setter Property="Background" Value="{StaticResource WinDanger}"/>
+      <Setter Property="Foreground" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinDanger}"/>
+    </Style>
+    <Style Selector="Button.Danger:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#B91C1C"/>
+      <Setter Property="BorderBrush" Value="#B91C1C"/>
+    </Style>
+    <Style Selector="Button.companyBtn">
+      <Setter Property="MinHeight" Value="88"/>
+      <Setter Property="Padding" Value="14,16"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinBorder}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+    </Style>
+    <Style Selector="Button.companyBtn:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#EFF6FF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
+    </Style>
+    <Style Selector="Button.companyBtn:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#DBEAFE"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
+    </Style>
+    <Style Selector="Button.tabBtn">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="MinHeight" Value="30"/>
+      <Setter Property="Padding" Value="12,4"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="FontSize" Value="13"/>
+    </Style>
+    <Style Selector="Button.tabBtn:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#F1F5F9"/>
+    </Style>
 
-        <!-- ── Primary Button ── -->
-        <Style Selector="Button.Primary">
-            <Setter Property="Background"  Value="{StaticResource WinHighlight}"/>
-            <Setter Property="Foreground"  Value="White"/>
-            <Setter Property="BorderBrush" Value="#005A9E"/>
-        </Style>
-        <Style Selector="Button.Primary:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"  Value="#106EBE"/>
-            <Setter Property="BorderBrush" Value="#005A9E"/>
-        </Style>
+    <!-- Inputs -->
+    <Style Selector="TextBox">
+      <Setter Property="FontFamily" Value="{StaticResource WinFontUI}"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="MinHeight" Value="36"/>
+      <Setter Property="Padding" Value="10,7"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinInputBorder}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Foreground" Value="{StaticResource AppTextColor}"/>
+    </Style>
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource WinHighlight}"/>
+    </Style>
 
-        <!-- ── Success Button ── -->
-        <Style Selector="Button.Success">
-            <Setter Property="Background"  Value="{StaticResource WinSuccess}"/>
-            <Setter Property="Foreground"  Value="White"/>
-            <Setter Property="BorderBrush" Value="#1A5C38"/>
-        </Style>
-        <Style Selector="Button.Success:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#1A5C38"/>
-        </Style>
-
-        <!-- ── Danger Button ── -->
-        <Style Selector="Button.Danger">
-            <Setter Property="Background"  Value="{StaticResource WinDanger}"/>
-            <Setter Property="Foreground"  Value="White"/>
-            <Setter Property="BorderBrush" Value="#A02315"/>
-        </Style>
-        <Style Selector="Button.Danger:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#A02315"/>
-        </Style>
-
-        <!-- ── Tab Border ── -->
-        <Style Selector="Border.tab">
-            <Setter Property="Background"      Value="#D8D8D8"/>
-            <Setter Property="BorderBrush"     Value="#B0B0B0"/>
-            <Setter Property="BorderThickness" Value="1,1,1,0"/>
-            <Setter Property="Margin"          Value="2,3,0,0"/>
-            <Setter Property="CornerRadius"    Value="0"/>
-        </Style>
-        <Style Selector="Border.tab.tabActive">
-            <Setter Property="Background"   Value="#F0F0F0"/>
-            <Setter Property="BorderBrush"  Value="#808080"/>
-            <Setter Property="Margin"       Value="2,2,0,0"/>
-        </Style>
-
-        <!-- ── Company Selection Button ── -->
-        <Style Selector="Button.companyBtn">
-            <Setter Property="Height"          Value="90"/>
-            <Setter Property="Padding"         Value="10,20"/>
-            <Setter Property="CornerRadius"    Value="2"/>
-            <Setter Property="BorderBrush"     Value="#A0A0A0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment"   Value="Center"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                        <GradientStop Color="#FFFFFF" Offset="0"/>
-                        <GradientStop Color="#E6E6E6" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style Selector="Button.companyBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                        <GradientStop Color="#EEF6FF" Offset="0"/>
-                        <GradientStop Color="#CCE4F7" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderBrush" Value="#0078D7"/>
-        </Style>
-        <Style Selector="Button.companyBtn:pressed /template/ ContentPresenter">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                        <GradientStop Color="#CCE4F7" Offset="0"/>
-                        <GradientStop Color="#B8D8F0" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── Tab Button ── -->
-        <Style Selector="Button.tabBtn">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="BorderBrush"     Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Height"          Value="22"/>
-            <Setter Property="Padding"         Value="10,1"/>
-            <Setter Property="CornerRadius"    Value="0"/>
-            <Setter Property="FontSize"        Value="12"/>
-        </Style>
-        <Style Selector="Button.tabBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="Transparent"/>
-        </Style>
-
-        <!-- ── TextBox ── -->
-        <Style Selector="TextBox">
-            <Setter Property="FontFamily"      Value="{StaticResource WinFontUI}"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="Height"          Value="24"/>
-            <Setter Property="MinHeight"       Value="24"/>
-            <Setter Property="Padding"         Value="5,3"/>
-            <Setter Property="CornerRadius"    Value="0"/>
-            <Setter Property="Background"      Value="#FFFFFF"/>
-            <Setter Property="BorderBrush"     Value="{StaticResource WinInputBorder}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-
-        <!-- ── Card Border ── -->
-        <Style Selector="Border.Card">
-            <Setter Property="Background"      Value="#FFFFFF"/>
-            <Setter Property="BorderBrush"     Value="{StaticResource WinBorderLight}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="16"/>
-        </Style>
-
-        <!-- ── DataGrid ── -->
-        <Style Selector="DataGrid">
-            <Setter Property="GridLinesVisibility"    Value="All"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="#D4D4D4"/>
-            <Setter Property="VerticalGridLinesBrush"   Value="#D4D4D4"/>
-            <Setter Property="RowHeight"              Value="28"/>
-            <Setter Property="FontSize"               Value="12"/>
-        </Style>
-        <Style Selector="DataGridColumnHeader">
-            <Setter Property="Background"      Value="#E4E4E4"/>
-            <Setter Property="BorderBrush"     Value="#C0C0C0"/>
-            <Setter Property="BorderThickness" Value="0,0,1,1"/>
-            <Setter Property="FontWeight"      Value="SemiBold"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="Padding"         Value="6,2"/>
-            <Setter Property="Height"          Value="26"/>
-        </Style>
-        <Style Selector="DataGridRow:nth-child(even)">
-            <Setter Property="Background" Value="#F9F9F9"/>
-        </Style>
-        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{StaticResource WinHighlight}"/>
-        </Style>
-    </Application.Styles>
+    <!-- Data grid: softer separators and readable rows -->
+    <Style Selector="DataGrid">
+      <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+      <Setter Property="HorizontalGridLinesBrush" Value="#E8EDF4"/>
+      <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+      <Setter Property="RowHeight" Value="40"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="{StaticResource WinBorderLight}"/>
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+      <Setter Property="Background" Value="#F8FAFC"/>
+      <Setter Property="BorderBrush" Value="#E8EDF4"/>
+      <Setter Property="BorderThickness" Value="0,0,0,1"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="#475569"/>
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="MinHeight" Value="38"/>
+    </Style>
+    <Style Selector="DataGridRow:nth-child(even)">
+      <Setter Property="Background" Value="#FCFDFE"/>
+    </Style>
+    <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="#DBEAFE"/>
+    </Style>
+  </Application.Styles>
 </Application>

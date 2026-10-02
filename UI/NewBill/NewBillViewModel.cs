@@ -59,6 +59,7 @@ public partial class NewBillViewModel : ViewModelBase
     [ObservableProperty] private decimal _subTotal;
     [ObservableProperty] private decimal _taxTotal;
     [ObservableProperty] private decimal _grandTotal;
+    [ObservableProperty] private decimal _totalAmount;
     [ObservableProperty] private decimal _gstPercentage  = 5m;
     [ObservableProperty] private int     _totalQuantity;
     [ObservableProperty] private decimal _taxableAmount;
@@ -345,7 +346,14 @@ public partial class NewBillViewModel : ViewModelBase
         PreviewIgstRate      = string.Empty;
         PreviewIgstAmount    = string.Empty;
         PreviewGstLabel      = $"GST {GstPercentage:0.#}%";
+        TotalAmount          = GrandTotal;
         PreviewAmountInWords = NumberToWordsConverter.ConvertAmount(GrandTotal);
+    }
+
+    partial void OnGrandTotalChanged(decimal value)
+    {
+        TotalAmount = value;
+        PreviewAmountInWords = NumberToWordsConverter.ConvertAmount(value);
     }
 
     // ── Preview toggle ─────────────────────────────────────────────────────
