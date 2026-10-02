@@ -34,6 +34,16 @@ public partial class SettingsViewModel : ViewModelBase
 
         if (company != null)
         {
+            var profile = DummyDataStore.GetCompanyProfile(company.Name ?? "AVANI ENTERPRISE");
+
+            if (string.IsNullOrWhiteSpace(company.RegisteredOffice)) company.RegisteredOffice = profile.AddressLine1;
+            if (string.IsNullOrWhiteSpace(company.SalesOffice)) company.SalesOffice = profile.AddressLine2;
+            if (string.IsNullOrWhiteSpace(company.Phone)) company.Phone = profile.Contact;
+            if (string.IsNullOrWhiteSpace(company.GSTIN)) company.GSTIN = profile.GSTIN;
+            if (string.IsNullOrWhiteSpace(company.BankName)) company.BankName = profile.BankName;
+            if (string.IsNullOrWhiteSpace(company.BankAccount)) company.BankAccount = profile.BankAccountNo;
+            if (string.IsNullOrWhiteSpace(company.IFSC)) company.IFSC = profile.BankIFSC;
+
             CurrentCompany = company;
             SessionContext.CurrentCompany = company;
         }

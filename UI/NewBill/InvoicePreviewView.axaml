@@ -5,7 +5,7 @@
              x:DataType="vm:NewBillViewModel"
              Width="794"
              Background="White"
-             FontFamily="Arial, sans-serif"
+             FontFamily="{StaticResource WinFontUI}"
              FontSize="9">
 
   <!-- Outer invoice box — 1.5px solid black border matching .invoice-box -->

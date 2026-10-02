@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:InvoicePro.ViewModels"
+             x:DataType="vm:LoadingViewModel"
+             x:Class="InvoicePro.Views.LoadingView">
+  <Grid>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+      <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#1673E6" Background="#E0E7F0"/>
+      <TextBlock Text="Loading invoice..." FontSize="13" Foreground="#536176" HorizontalAlignment="Center"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

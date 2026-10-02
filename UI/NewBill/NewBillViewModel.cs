@@ -124,8 +124,6 @@ public partial class NewBillViewModel : ViewModelBase
         SelectedCompany = DummyDataStore.GetCompanyProfile(selectedCompanyName);
         PreviewCompanyName = SelectedCompany.CompanyName;
         Customers = new ObservableCollection<CustomerModel>(DummyDataStore.Customers);
-        // Load customers from the company-specific database (if available)
-        _ = LoadCustomersFromDbAsync();
         // Reload customers when the current company changes at runtime
         SessionContext.CurrentCompanyChanged += async _ => await LoadCustomersFromDbAsync();
         // Reload customers when any other part of the app mutates customers
@@ -134,8 +132,9 @@ public partial class NewBillViewModel : ViewModelBase
         // ensure at least one blank row is visible by default for easier data entry
         if (InvoiceItems.Count == 0)
             InvoiceItems.Add(new InvoiceItemModel());
-        _ = LoadCompanyFromDbAsync();
         UseSameCustomer = true;
+        // Run both DB loads in parallel for faster startup
+        _ = Task.WhenAll(LoadCompanyFromDbAsync(), LoadCustomersFromDbAsync());
     }
 
     private async Task LoadCustomersFromDbAsync()
@@ -176,16 +175,32 @@ public partial class NewBillViewModel : ViewModelBase
         {
             Company? company = SessionContext.CurrentCompany;
 
+            // Single DB open for both company + invoice prefix queries
+            using var db = new BillingDbContext();
+
             if (company == null)
             {
-                using var db = new BillingDbContext();
-                company = await db.Companies.FirstOrDefaultAsync();
+                company = await db.Companies.AsNoTracking().FirstOrDefaultAsync();
                 if (company != null)
                     SessionContext.CurrentCompany = company;
             }
 
             if (company != null)
             {
+                var profile = DummyDataStore.GetCompanyProfile(company.Name ?? _defaultCompanyName);
+
+                company.Name             = string.IsNullOrWhiteSpace(company.Name)             ? _defaultCompanyName      : company.Name;
+                company.RegisteredOffice = string.IsNullOrWhiteSpace(company.RegisteredOffice) ? profile.AddressLine1     : company.RegisteredOffice;
+                company.SalesOffice      = string.IsNullOrWhiteSpace(company.SalesOffice)      ? profile.AddressLine2     : company.SalesOffice;
+                company.Phone            = string.IsNullOrWhiteSpace(company.Phone)            ? profile.Contact          : company.Phone;
+                company.GSTIN            = string.IsNullOrWhiteSpace(company.GSTIN)            ? profile.GSTIN            : company.GSTIN;
+                company.State            = string.IsNullOrWhiteSpace(company.State)            ? profile.State            : company.State;
+                company.StateCode        = string.IsNullOrWhiteSpace(company.StateCode)        ? profile.StateCode        : company.StateCode;
+                company.BankName         = string.IsNullOrWhiteSpace(company.BankName)         ? profile.BankName         : company.BankName;
+                company.BankBranch       = string.IsNullOrWhiteSpace(company.BankBranch)       ? profile.BankBranch       : company.BankBranch;
+                company.BankAccount      = string.IsNullOrWhiteSpace(company.BankAccount)      ? profile.BankAccountNo    : company.BankAccount;
+                company.IFSC             = string.IsNullOrWhiteSpace(company.IFSC)             ? profile.BankIFSC         : company.IFSC;
+
                 CompanyName      = company.Name;
                 CompanyAddress1  = company.RegisteredOffice;
                 CompanyAddress2  = company.SalesOffice;
@@ -193,52 +208,53 @@ public partial class NewBillViewModel : ViewModelBase
                 CompanyGstin     = company.GSTIN;
                 CompanyState     = company.State;
                 CompanyStateCode = company.StateCode;
-                // Prefill invoice state values from company info (editable by user)
                 InvoiceState     = company.State ?? string.Empty;
                 InvoiceStateCode = company.StateCode ?? string.Empty;
                 InvoiceDate      = DateTimeOffset.Now;
                 InvoiceDateOnly  = InvoiceDate.DateTime;
-                // Prepare a company-prefixed invoice number: check ApplicationSettings for InvoicePrefix first
+
+                // Invoice prefix + last invoice number — same DB connection
                 try
                 {
-                    using var db2 = new BillingDbContext();
-                    var prefixSetting = await db2.ApplicationSettings.FirstOrDefaultAsync(s => s.Key == "InvoicePrefix");
+                    var prefixSetting = await db.ApplicationSettings.AsNoTracking().FirstOrDefaultAsync(s => s.Key == "InvoicePrefix");
                     string prefix = !string.IsNullOrWhiteSpace(prefixSetting?.Value)
                         ? prefixSetting.Value.Trim().ToUpperInvariant()
-                        : (!string.IsNullOrWhiteSpace(company.Name) ? company.Name.Substring(0, 1).ToUpperInvariant() : "INV");
+                        : (!string.IsNullOrWhiteSpace(company.Name) ? company.Name[0].ToString().ToUpperInvariant() : "INV");
 
-                    var lastInvoice = await db2.Invoices.OrderByDescending(i => i.Id).FirstOrDefaultAsync();
+                    var lastInvoice = await db.Invoices.AsNoTracking().OrderByDescending(i => i.Id).FirstOrDefaultAsync();
                     var nextNumber = (lastInvoice?.Id ?? 0) + 1;
                     _suppressInvoiceNumberChange = true;
                     InvoiceNumber = $"{prefix}-{nextNumber}";
                     _suppressInvoiceNumberChange = false;
                 }
                 catch { /* ignore settings fetch failures */ }
-                PreviewCompanyName = company.Name;
 
+                PreviewCompanyName = company.Name;
                 SelectedCompany = new CompanyProfile
                 {
                     Id            = company.Id,
-                    CompanyName   = company.Name,
-                    AddressLine1  = company.RegisteredOffice,
-                    AddressLine2  = company.SalesOffice,
-                    Contact       = company.Phone,
-                    GSTIN         = company.GSTIN,
-                    BankName      = company.BankName,
-                    BankBranch    = company.BankBranch,
-                    BankAccountNo = company.BankAccount,
-                    BankIFSC      = company.IFSC
+                    CompanyName   = company.Name ?? string.Empty,
+                    AddressLine1  = company.RegisteredOffice ?? string.Empty,
+                    AddressLine2  = company.SalesOffice ?? string.Empty,
+                    Contact       = company.Phone ?? string.Empty,
+                    GSTIN         = company.GSTIN ?? string.Empty,
+                    BankName      = company.BankName ?? string.Empty,
+                    BankBranch    = company.BankBranch ?? string.Empty,
+                    BankAccountNo = company.BankAccount ?? string.Empty,
+                    BankIFSC      = company.IFSC ?? string.Empty,
+                    State         = company.State ?? string.Empty,
+                    StateCode     = company.StateCode ?? string.Empty
                 };
                 return;
             }
 
-            CompanyName      = SelectedCompany.CompanyName;
-            CompanyAddress1  = SelectedCompany.AddressLine1;
-            CompanyAddress2  = SelectedCompany.AddressLine2;
-            CompanyPhone     = SelectedCompany.Contact;
-            CompanyGstin     = SelectedCompany.GSTIN;
-            CompanyState     = string.Empty;
-            CompanyStateCode = string.Empty;
+            CompanyName        = SelectedCompany.CompanyName;
+            CompanyAddress1    = SelectedCompany.AddressLine1;
+            CompanyAddress2    = SelectedCompany.AddressLine2;
+            CompanyPhone       = SelectedCompany.Contact;
+            CompanyGstin       = SelectedCompany.GSTIN;
+            CompanyState       = string.Empty;
+            CompanyStateCode   = string.Empty;
             PreviewCompanyName = SelectedCompany.CompanyName;
         }
         catch { /* fall back to DummyDataStore values already set */ }

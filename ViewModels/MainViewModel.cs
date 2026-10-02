@@ -31,11 +31,13 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel(string companyName = "AVANI ENTERPRISE")
     {
-        _currentPage = new NewBillViewModel(companyName);
+        _selectedCompanyName = companyName;
         _companyName = companyName;
-        NavigationService.NavigateTo    = Navigate;
-        NavigationService.SetStatus     = text => StatusText = text;
-        NavigationService.SetCompany    = name => CompanyName = name;
+        // Start with a lightweight placeholder — NewBillViewModel loads async in background
+        _currentPage = new LoadingViewModel();
+        NavigationService.NavigateTo      = Navigate;
+        NavigationService.SetStatus       = text => StatusText = text;
+        NavigationService.SetCompany      = name => CompanyName = name;
         NavigationService.SetInvoiceCount = text => InvoiceCountText = text;
         IsNewBillActive = true;
 
@@ -43,9 +45,17 @@ public partial class MainViewModel : ViewModelBase
         SessionContext.CurrentCompanyChanged += company =>
         {
             CompanyName = company?.Name ?? _companyName;
-            // Navigate to a fresh NewBill page for the selected company
             Navigate(new NewBillViewModel(company?.Name ?? _selectedCompanyName));
         };
+
+        // Load NewBillViewModel in background, then swap in
+        _ = InitNewBillAsync(companyName);
+    }
+
+    private async Task InitNewBillAsync(string companyName)
+    {
+        await Task.Yield(); // let the window render the placeholder first
+        Navigate(new NewBillViewModel(companyName));
     }
 
     // Allow switching company via the NavigationService (MainWindow wires the UI)

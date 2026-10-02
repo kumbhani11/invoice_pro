@@ -11,6 +11,8 @@ public class CompanyProfile
     public string AddressLine2  { get; set; } = string.Empty;
     public string Contact       { get; set; } = string.Empty;
     public string GSTIN         { get; set; } = string.Empty;
+    public string State         { get; set; } = string.Empty;
+    public string StateCode     { get; set; } = string.Empty;
     public string BankName      { get; set; } = string.Empty;
     public string BankBranch    { get; set; } = string.Empty;
     public string BankAccountNo { get; set; } = string.Empty;

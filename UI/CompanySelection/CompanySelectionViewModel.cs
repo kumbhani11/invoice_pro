@@ -51,6 +51,9 @@ public partial class CompanySelectionViewModel : ViewModelBase
         LoadingMessage = $"Loading {companyName}...";
         ErrorMessage = string.Empty;
 
+        // Yield to UI thread so the loading overlay renders before heavy work
+        await Task.Yield();
+
         try
         {
             var dbPath = Path.Join(GetAppFolder(), dbFileName);
@@ -64,11 +67,55 @@ public partial class CompanySelectionViewModel : ViewModelBase
                 await db.Database.MigrateAsync();
 
                 var company = await db.Companies.FirstOrDefaultAsync();
+                var profile = DummyDataStore.GetCompanyProfile(companyName);
+
                 if (company == null)
                 {
-                    company = new Company { Name = companyName };
+                    company = new Company
+                    {
+                        Name = companyName,
+                        RegisteredOffice = profile.AddressLine1,
+                        SalesOffice = profile.AddressLine2,
+                        Phone = profile.Contact,
+                        Email = string.Empty,
+                        GSTIN = profile.GSTIN,
+                        State = profile.State,
+                        StateCode = profile.StateCode,
+                        BankName = profile.BankName,
+                        BankBranch = profile.BankBranch,
+                        BankAccount = profile.BankAccountNo,
+                        IFSC = profile.BankIFSC,
+                        TermsAndConditions = string.Empty,
+                        AuthorizedSignatoryText = string.Empty
+                    };
                     db.Companies.Add(company);
                     await db.SaveChangesAsync();
+                }
+                else
+                {
+                    bool needsHydration = string.IsNullOrWhiteSpace(company.RegisteredOffice)
+                        || string.IsNullOrWhiteSpace(company.SalesOffice)
+                        || string.IsNullOrWhiteSpace(company.Phone)
+                        || string.IsNullOrWhiteSpace(company.GSTIN)
+                        || string.IsNullOrWhiteSpace(company.BankName)
+                        || string.IsNullOrWhiteSpace(company.BankAccount)
+                        || string.IsNullOrWhiteSpace(company.IFSC);
+
+                    if (needsHydration)
+                    {
+                        company.Name = companyName;
+                        company.RegisteredOffice = string.IsNullOrWhiteSpace(company.RegisteredOffice) ? profile.AddressLine1 : company.RegisteredOffice;
+                        company.SalesOffice = string.IsNullOrWhiteSpace(company.SalesOffice) ? profile.AddressLine2 : company.SalesOffice;
+                        company.Phone = string.IsNullOrWhiteSpace(company.Phone) ? profile.Contact : company.Phone;
+                        company.GSTIN = string.IsNullOrWhiteSpace(company.GSTIN) ? profile.GSTIN : company.GSTIN;
+                        company.State = string.IsNullOrWhiteSpace(company.State) ? profile.State : company.State;
+                        company.StateCode = string.IsNullOrWhiteSpace(company.StateCode) ? profile.StateCode : company.StateCode;
+                        company.BankName = string.IsNullOrWhiteSpace(company.BankName) ? profile.BankName : company.BankName;
+                        company.BankBranch = string.IsNullOrWhiteSpace(company.BankBranch) ? profile.BankBranch : company.BankBranch;
+                        company.BankAccount = string.IsNullOrWhiteSpace(company.BankAccount) ? profile.BankAccountNo : company.BankAccount;
+                        company.IFSC = string.IsNullOrWhiteSpace(company.IFSC) ? profile.BankIFSC : company.IFSC;
+                        await db.SaveChangesAsync();
+                    }
                 }
 
                 SessionContext.CurrentCompany = company;

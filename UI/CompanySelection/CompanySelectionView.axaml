@@ -10,7 +10,6 @@
         WindowStartupLocation="CenterScreen"
         CanResize="False"
         Background="#F3F6FA"
-        FontFamily="Segoe UI, Tahoma, Arial, sans-serif"
         FontSize="12">
 
     <Grid>
@@ -41,10 +40,6 @@
                     </StackPanel>
                 </Button>
             </Grid>
-
-            <Border BorderBrush="#D1D5DB" BorderThickness="1" Padding="10" CornerRadius="8" Background="#FFFFFF" IsVisible="{Binding !!ErrorMessage}">
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="#B91C1C" TextWrapping="Wrap"/>
-            </Border>
         </StackPanel>
 
         <Border IsVisible="{Binding IsLoading}" Background="#66000000">

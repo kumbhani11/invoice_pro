@@ -6,9 +6,7 @@
         Title="InvoicePro — Commercial Billing System"
         Width="1200" Height="740"
         MinWidth="900" MinHeight="560"
-        Background="{StaticResource WinBg}"
-        FontFamily="{StaticResource WinFontUI}"
-        FontSize="12">
+        Background="{StaticResource WinBg}">
 
     <Grid RowDefinitions="Auto, *, Auto">
 
