@@ -101,19 +101,19 @@
             <StackPanel Spacing="2">
               <StackPanel Orientation="Horizontal" Spacing="3">
                 <TextBlock Text="Supply to party" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SelectedCustomer.CustomerName}" FontWeight="Bold" FontSize="11"/>
+                <TextBlock Text="{Binding SupplyToName}" FontWeight="Bold" FontSize="11"/>
               </StackPanel>
-              <TextBlock Text="{Binding SelectedCustomer.Address}"
+              <TextBlock Text="{Binding SupplyToAddress}"
                          Margin="70,0,0,0" TextWrapping="Wrap" FontSize="8"/>
               <StackPanel Margin="0,6,0,0" Orientation="Horizontal" Spacing="2">
                 <TextBlock Text="GSTIN      :" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Text="{Binding SelectedCustomer.GSTIN}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SupplyToGstin}" FontWeight="Bold" FontSize="8"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="2">
                 <TextBlock Text="State        :" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Text="{Binding SelectedCustomer.State}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SupplyToState}" FontWeight="Bold" FontSize="8"/>
                 <TextBlock Text="   State Code:" FontWeight="Bold" FontSize="8"/>
-                <TextBlock Text="{Binding SelectedCustomer.StateCode}" FontWeight="Bold" FontSize="8"/>
+                <TextBlock Text="{Binding SupplyToStateCode}" FontWeight="Bold" FontSize="8"/>
               </StackPanel>
             </StackPanel>
           </Border>
@@ -330,11 +330,11 @@
                 </Grid>
               </Border>
 
-              <!-- Tax data row: G.S.T 5% -->
+              <!-- Tax data row: label bound to actual rate -->
               <Border BorderBrush="Black" BorderThickness="1,0,1,1">
                 <Grid ColumnDefinitions="80,60,80,60,80,60,80">
                   <Border Grid.Column="0" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
-                    <TextBlock Text="G.S.T 5%" FontWeight="Bold" FontSize="7"/>
+                    <TextBlock Text="{Binding PreviewGstLabel}" FontWeight="Bold" FontSize="7"/>
                   </Border>
                   <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
                     <TextBlock Text="{Binding PreviewCgstRate}" FontSize="7" HorizontalAlignment="Center"/>

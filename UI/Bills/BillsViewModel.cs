@@ -80,6 +80,20 @@ public partial class BillsViewModel : ViewModelBase
         {
             try
             {
+                // Derive GST rates from saved amounts and taxable base — never hardcode
+                decimal taxable = fullInvoice.TaxableAmount;
+                decimal cgstRate = 0m, sgstRate = 0m, igstRate = 0m;
+                if (taxable > 0)
+                {
+                    if (fullInvoice.IGST > 0)
+                        igstRate = Math.Round(fullInvoice.IGST / taxable * 100m, 4);
+                    else
+                    {
+                        cgstRate = Math.Round(fullInvoice.CGST / taxable * 100m, 4);
+                        sgstRate = Math.Round(fullInvoice.SGST / taxable * 100m, 4);
+                    }
+                }
+
                 var printModel = new PrintDocumentModel
                 {
                     DocumentType = "TAX_INVOICE",
@@ -93,36 +107,45 @@ public partial class BillsViewModel : ViewModelBase
                         Phone = fullInvoice.CustomerPhone ?? "",
                         GSTIN = fullInvoice.CustomerGSTIN ?? "",
                         City = "",
-                        State = "",
-                        StateCode = ""
+                        State = fullInvoice.CustomerState ?? "",
+                        StateCode = fullInvoice.CustomerStateCode ?? ""
                     },
                     Supply = new PrintCustomerModel 
                     { 
-                        Name = fullInvoice.CustomerName ?? "", 
-                        Address = fullInvoice.CustomerAddress ?? "",
+                        Name = !string.IsNullOrWhiteSpace(fullInvoice.ShippingName) ? fullInvoice.ShippingName : fullInvoice.CustomerName ?? "",
+                        Address = !string.IsNullOrWhiteSpace(fullInvoice.ShippingAddress) ? fullInvoice.ShippingAddress : fullInvoice.CustomerAddress ?? "",
                         Phone = fullInvoice.CustomerPhone ?? "",
-                        GSTIN = fullInvoice.CustomerGSTIN ?? "",
+                        GSTIN = !string.IsNullOrWhiteSpace(fullInvoice.ShippingGSTIN) ? fullInvoice.ShippingGSTIN : fullInvoice.CustomerGSTIN ?? "",
                         City = "",
-                        State = "",
-                        StateCode = ""
+                        State = !string.IsNullOrWhiteSpace(fullInvoice.ShippingState) ? fullInvoice.ShippingState : fullInvoice.CustomerState ?? "",
+                        StateCode = !string.IsNullOrWhiteSpace(fullInvoice.ShippingStateCode) ? fullInvoice.ShippingStateCode : fullInvoice.CustomerStateCode ?? ""
                     },
                     GrossAmount = fullInvoice.GrossAmount,
                     Discount = fullInvoice.Discount,
                     TaxableAmount = fullInvoice.TaxableAmount,
                     CGST = fullInvoice.CGST,
                     SGST = fullInvoice.SGST,
+                    IGST = fullInvoice.IGST,
                     RoundOff = fullInvoice.RoundOff,
                     NetAmount = fullInvoice.NetAmount,
-                    CgstRate = 9m, // Since Hardika default is 9%
-                    SgstRate = 9m,
+                    CgstRate = cgstRate,
+                    SgstRate = sgstRate,
+                    IgstRate = igstRate,
                     Items = fullInvoice.Items.Select(x => new PrintItemModel 
                     {
                         ProductDescription = x.Description ?? "",
+                        ProductAttribute = x.Fit ?? "",
+                        Size = x.Size ?? "",
                         HSN = x.HSN ?? "",
                         Quantity = x.Quantity,
+                        UOM = x.UOM ?? "Pcs",
                         Rate = x.Rate,
                         Amount = x.Amount
-                    }).ToList()
+                    }).ToList(),
+                    Transport = !string.IsNullOrWhiteSpace(fullInvoice.TransportName) ? fullInvoice.TransportName : "Mahendra",
+                    ReverseCharge = string.Equals(fullInvoice.ReverseCharge, "Yes", StringComparison.OrdinalIgnoreCase),
+                    DateOfSupply = fullInvoice.DateOfSupply == default ? fullInvoice.InvoiceDate.ToString("dd-MMM-yyyy") : fullInvoice.DateOfSupply.ToString("dd-MMM-yyyy"),
+                    PlaceOfSupply = !string.IsNullOrWhiteSpace(fullInvoice.PlaceOfSupply) ? fullInvoice.PlaceOfSupply : "Mumbai",
                 };
 
                 var doc = new MasterDocumentTemplate(printModel);

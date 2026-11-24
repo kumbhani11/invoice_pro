@@ -174,6 +174,9 @@ namespace InvoicePro.Data.Migrations
                     b.Property<decimal>("Discount")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("DateOfSupply")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("GrossAmount")
                         .HasColumnType("TEXT");
 
@@ -193,23 +196,52 @@ namespace InvoicePro.Data.Migrations
                     b.Property<decimal>("NetAmount")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PlaceOfSupply")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PrintedAmountInWords")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReverseCharge")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingGSTIN")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingState")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingStateCode")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("RoundOff")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("SGST")
-                        .HasColumnType("TEXT");
-
                     b.Property<decimal>("TaxableAmount")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TotalQuantity")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("TransportName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InvoiceNumber")
+                        .IsUnique();
 
                     b.ToTable("Invoices");
                 });
@@ -242,10 +274,13 @@ namespace InvoicePro.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Rate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TaxRate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Size")

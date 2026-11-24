@@ -13,6 +13,13 @@ public class Invoice {
     public string CustomerAddress { get; set; } = string.Empty;
     public string CustomerState { get; set; } = string.Empty;
     public string CustomerStateCode { get; set; } = string.Empty;
+
+    // Shipping snapshot
+    public string ShippingName { get; set; } = string.Empty;
+    public string ShippingAddress { get; set; } = string.Empty;
+    public string ShippingGSTIN { get; set; } = string.Empty;
+    public string ShippingState { get; set; } = string.Empty;
+    public string ShippingStateCode { get; set; } = string.Empty;
     
     // Totals
     public int TotalQuantity { get; set; }
@@ -28,6 +35,12 @@ public class Invoice {
     // State/Status
     public bool IsCancelled { get; set; }
     public string PrintedAmountInWords { get; set; } = string.Empty;
+
+    // Additional invoice details
+    public string ReverseCharge { get; set; } = "No";
+    public string TransportName { get; set; } = string.Empty;
+    public DateTime DateOfSupply { get; set; } = DateTime.Now;
+    public string PlaceOfSupply { get; set; } = string.Empty;
     
     public List<InvoiceItem> Items { get; set; } = new();
 }

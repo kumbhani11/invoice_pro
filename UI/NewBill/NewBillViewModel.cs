@@ -23,8 +23,9 @@ namespace InvoicePro.UI.NewBill;
 public partial class NewBillViewModel : ViewModelBase
 {
     private readonly string _defaultCompanyName;
-    private decimal _cgst, _sgst, _roundOff;
+    private decimal _cgst, _sgst, _igst, _roundOff;
     private bool _suppressInvoiceNumberChange;
+    private bool _dateOfSupplyWasInitialized;
 
     // ── Company & Customer ────────────────────────────────────────────────
     [ObservableProperty] private CompanyProfile _selectedCompany = new();
@@ -65,9 +66,9 @@ public partial class NewBillViewModel : ViewModelBase
 
     // ── Transport ─────────────────────────────────────────────────────────
     [ObservableProperty] private string _reverseCharge   = "No";
-    [ObservableProperty] private string _transportName   = string.Empty;
+    [ObservableProperty] private string _transportName   = "Mahendra";
     [ObservableProperty] private DateTimeOffset _dateOfSupply = DateTimeOffset.Now;
-    [ObservableProperty] private string _placeOfSupply   = string.Empty;
+    [ObservableProperty] private string _placeOfSupply   = "Mumbai";
 
     // ── Inter-state flag (drives CGST+SGST vs IGST) ──────────────────────
     [ObservableProperty] private bool _isInterState;
@@ -78,8 +79,13 @@ public partial class NewBillViewModel : ViewModelBase
     // ── Print busy guard ─────────────────────────────────────────────────
     [ObservableProperty] private bool _isPrinting;
 
+    // ── Reverse charge options ────────────────────────────────────────────
+    public string[] ReverseChargeOptions { get; } = { "No", "Yes" };
+
     // ── Totals ────────────────────────────────────────────────────────────
-    [ObservableProperty] private decimal _discountAmount;
+    [ObservableProperty] private decimal _discountPercent;      // clamped 0-100
+    [ObservableProperty] private string  _discountPercentText = "0"; // raw text input
+    [ObservableProperty] private decimal _discountAmount;       // computed flat ₹
     [ObservableProperty] private decimal _subTotal;
     [ObservableProperty] private decimal _taxTotal;
     [ObservableProperty] private decimal _grandTotal;
@@ -336,9 +342,9 @@ public partial class NewBillViewModel : ViewModelBase
     {
         if (InvoiceDateOnly.Date != value.DateTime.Date)
             InvoiceDateOnly = value.DateTime;
-        var s = value.DateTime.ToString("dd/MM/yyyy");
-        if (InvoiceDateString != s)
-            InvoiceDateString = s;
+
+        if (!_dateOfSupplyWasInitialized)
+            DateOfSupply = value;
     }
 
     partial void OnInvoiceDateOnlyChanged(DateTime value)
@@ -409,15 +415,38 @@ public partial class NewBillViewModel : ViewModelBase
     }
 
     // ── Totals ────────────────────────────────────────────────────────────
-    partial void OnDiscountAmountChanged(decimal value) => CalculateTotals();
-    partial void OnGstPercentageChanged(decimal value)  => CalculateTotals();
-    partial void OnIsInterStateChanged(bool value)      => CalculateTotals();
+    partial void OnDiscountPercentTextChanged(string value)
+    {
+        // Parse safely — empty/invalid input = 0, no cast exception possible
+        if (!decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
+            parsed = 0m;
+        // Clamp strictly to [0, 100]
+        var clamped = Math.Max(0m, Math.Min(100m, parsed));
+        DiscountPercent = clamped;
+        CalculateTotals();
+    }
+
+    partial void OnDiscountPercentChanged(decimal value) { /* driven by OnDiscountPercentTextChanged */ }
+    partial void OnDiscountAmountChanged(decimal value)  { /* computed in CalculateTotals */ }
+    partial void OnGstPercentageChanged(decimal value)   => CalculateTotals();
+    partial void OnIsInterStateChanged(bool value)       => CalculateTotals();
 
     private void CalculateTotals()
     {
+        try
+        {
+        // Compute subtotal first so discount % is applied to the correct base
+        var rawSubTotal = InvoiceItems.Count > 0
+            ? InvoiceItems.Sum(item => item.Qty * item.Rate)
+            : 0m;
+        var flatDiscount = rawSubTotal > 0m
+            ? Math.Round(rawSubTotal * DiscountPercent / 100m, 2)
+            : 0m;
+        DiscountAmount = flatDiscount;
+
         var result = InvoiceCalculationService.Calculate(
             InvoiceItems.Select(item => new InvoiceLineItemInput { Quantity = item.Qty, Rate = item.Rate }),
-            DiscountAmount,
+            flatDiscount,
             GstPercentage,
             isInterState: IsInterState);
 
@@ -428,6 +457,7 @@ public partial class NewBillViewModel : ViewModelBase
         SgstAmount = result.SgstAmount;
         _cgst = result.CgstAmount;
         _sgst = result.SgstAmount;
+        _igst = result.IgstAmount;
         _roundOff = result.RoundOffAmount;
         TaxTotal = result.TaxTotal;
         GrandTotal = result.GrandTotal;
@@ -455,6 +485,8 @@ public partial class NewBillViewModel : ViewModelBase
         PreviewGstLabel = $"GST {GstPercentage:0.#}%";
         PreviewAmountInWords = NumberToWordsConverter.ConvertAmount(result.GrandTotal);
         AmountInWords = PreviewAmountInWords;
+        }
+        catch { /* swallow any unexpected calculation error — UI stays stable */ }
     }
 
     partial void OnGrandTotalChanged(decimal value)
@@ -480,6 +512,10 @@ public partial class NewBillViewModel : ViewModelBase
     // ── Print (validate → save → PDF → print) ────────────────────────────
     // The code-behind wires the actual PDF/print step via PrintRequested.
     public Func<Task>? PrintRequested { get; set; }
+
+    [RelayCommand]
+    private async Task SwitchCompany() =>
+        await (NavigationService.OpenCompanySelection?.Invoke() ?? Task.CompletedTask);
 
     [RelayCommand(CanExecute = nameof(CanPrint))]
     private async Task PrintAsync()
@@ -547,34 +583,108 @@ public partial class NewBillViewModel : ViewModelBase
                 CustomerAddress   = string.IsNullOrWhiteSpace(BillToAddress) ? (SelectedCustomer?.Address ?? "") : BillToAddress,
                 CustomerState     = string.IsNullOrWhiteSpace(BillToState) ? (SelectedCustomer?.State ?? "") : BillToState,
                 CustomerStateCode = string.IsNullOrWhiteSpace(BillToStateCode) ? (SelectedCustomer?.StateCode ?? "") : BillToStateCode,
+                ShippingName      = string.IsNullOrWhiteSpace(SupplyToName) ? (SupplyToCustomer?.CustomerName ?? "") : SupplyToName,
+                ShippingAddress   = string.IsNullOrWhiteSpace(SupplyToAddress) ? (SupplyToCustomer?.Address ?? "") : SupplyToAddress,
+                ShippingGSTIN     = string.IsNullOrWhiteSpace(SupplyToGstin) ? (SupplyToCustomer?.GSTIN ?? "") : SupplyToGstin,
+                ShippingState     = string.IsNullOrWhiteSpace(SupplyToState) ? (SupplyToCustomer?.State ?? "") : SupplyToState,
+                ShippingStateCode = string.IsNullOrWhiteSpace(SupplyToStateCode) ? (SupplyToCustomer?.StateCode ?? "") : SupplyToStateCode,
+                ReverseCharge     = string.IsNullOrWhiteSpace(ReverseCharge) ? "No" : ReverseCharge,
+                TransportName     = TransportName?.Trim() ?? "",
+                DateOfSupply      = DateOfSupply.DateTime,
+                PlaceOfSupply     = PlaceOfSupply?.Trim() ?? "",
                 TotalQuantity     = (int)InvoiceItems.Sum(r => r.Qty),
                 GrossAmount       = SubTotal,
                 Discount          = DiscountAmount,
                 TaxableAmount     = taxable,
                 CGST              = _cgst,
                 SGST              = _sgst,
-                IGST              = 0,
+                IGST              = _igst,
                 RoundOff          = _roundOff,
                 NetAmount         = GrandTotal,
                 PrintedAmountInWords = PreviewAmountInWords,
                 IsCancelled       = false
             };
 
-            db.Invoices.Add(invoice);
-            await db.SaveChangesAsync();
+            var existing = await db.Invoices
+                .Include(i => i.Items)
+                .FirstOrDefaultAsync(i => i.InvoiceNumber == InvoiceNumber);
+
+            if (existing == null)
+            {
+                db.Invoices.Add(invoice);
+                await db.SaveChangesAsync();
+            }
+            else
+            {
+                invoice = existing;
+
+                invoice.InvoiceDate = InvoiceDate.DateTime;
+                invoice.CustomerName = string.IsNullOrWhiteSpace(BillToName) ? (SelectedCustomer?.CustomerName ?? "Cash Customer") : BillToName;
+                invoice.CustomerGSTIN = string.IsNullOrWhiteSpace(BillToGstin) ? (SelectedCustomer?.GSTIN ?? "") : BillToGstin;
+                invoice.CustomerPhone = "";
+                invoice.CustomerAddress = string.IsNullOrWhiteSpace(BillToAddress) ? (SelectedCustomer?.Address ?? "") : BillToAddress;
+                invoice.CustomerState = string.IsNullOrWhiteSpace(BillToState) ? (SelectedCustomer?.State ?? "") : BillToState;
+                invoice.CustomerStateCode = string.IsNullOrWhiteSpace(BillToStateCode) ? (SelectedCustomer?.StateCode ?? "") : BillToStateCode;
+                invoice.ShippingName = string.IsNullOrWhiteSpace(SupplyToName) ? (SupplyToCustomer?.CustomerName ?? "") : SupplyToName;
+                invoice.ShippingAddress = string.IsNullOrWhiteSpace(SupplyToAddress) ? (SupplyToCustomer?.Address ?? "") : SupplyToAddress;
+                invoice.ShippingGSTIN = string.IsNullOrWhiteSpace(SupplyToGstin) ? (SupplyToCustomer?.GSTIN ?? "") : SupplyToGstin;
+                invoice.ShippingState = string.IsNullOrWhiteSpace(SupplyToState) ? (SupplyToCustomer?.State ?? "") : SupplyToState;
+                invoice.ShippingStateCode = string.IsNullOrWhiteSpace(SupplyToStateCode) ? (SupplyToCustomer?.StateCode ?? "") : SupplyToStateCode;
+                invoice.ReverseCharge = string.IsNullOrWhiteSpace(ReverseCharge) ? "No" : ReverseCharge;
+                invoice.TransportName = TransportName?.Trim() ?? "";
+                invoice.DateOfSupply = DateOfSupply.DateTime;
+                invoice.PlaceOfSupply = PlaceOfSupply?.Trim() ?? "";
+                invoice.TotalQuantity = (int)InvoiceItems.Sum(r => r.Qty);
+                invoice.GrossAmount = SubTotal;
+                invoice.Discount = DiscountAmount;
+                invoice.TaxableAmount = taxable;
+                invoice.CGST = _cgst;
+                invoice.SGST = _sgst;
+                invoice.IGST = _igst;
+                invoice.RoundOff = _roundOff;
+                invoice.NetAmount = GrandTotal;
+                invoice.PrintedAmountInWords = PreviewAmountInWords;
+
+                db.InvoiceItems.RemoveRange(existing.Items);
+                await db.SaveChangesAsync();
+            }
 
             foreach (var row in InvoiceItems)
             {
+                var productCode = row.ProductCode?.Trim() ?? "";
+                var taxRate = row.TaxRate;
+
+                if (string.IsNullOrWhiteSpace(productCode) || taxRate == 0m)
+                {
+                    var description = row.ProductDescription?.Trim() ?? "";
+                    var hsn = row.Hsn?.Trim() ?? "";
+
+                    var product = await db.Products.AsNoTracking()
+                        .FirstOrDefaultAsync(p =>
+                            (!string.IsNullOrEmpty(description) && p.Description == description)
+                            || (!string.IsNullOrEmpty(hsn) && p.HSN == hsn));
+
+                    if (string.IsNullOrWhiteSpace(productCode) && product != null)
+                        productCode = product.ProductCode ?? "";
+
+                    if (taxRate == 0m)
+                        taxRate = product?.TaxPercentage > 0m
+                            ? product.TaxPercentage
+                            : GstPercentage;
+                }
+
                 db.InvoiceItems.Add(new InvoiceItem
                 {
                     InvoiceId   = invoice.Id,
-                    Description = row.ProductDescription,
-                    Fit         = row.Fit,
-                    Size        = row.Size,
-                    HSN         = row.Hsn,
+                    Description = row.ProductDescription ?? "",
+                    Fit         = row.Fit ?? "",
+                    Size        = row.Size ?? "",
+                    HSN         = row.Hsn ?? "",
                     UOM         = row.Uom,
-                    Quantity    = (int)row.Qty,
+                    ProductCode = productCode,
+                    Quantity    = row.Qty,
                     Rate        = row.Rate,
+                    TaxRate     = taxRate,
                     Amount      = row.Amount
                 });
             }
@@ -624,8 +734,11 @@ public partial class NewBillViewModel : ViewModelBase
     [RelayCommand]
     private void ClearForm()
     {
+        _dateOfSupplyWasInitialized = false;
         SelectedCustomer = null;
-        DiscountAmount   = 0;
+        DiscountPercent     = 0;
+        DiscountPercentText = "0";
+        DiscountAmount      = 0;
         GstPercentage    = 5m;
         InvoiceItems.Clear();
         InvoiceDate      = DateTimeOffset.Now;
@@ -633,8 +746,7 @@ public partial class NewBillViewModel : ViewModelBase
         InvoiceState     = string.Empty;
         InvoiceStateCode = string.Empty;
         ReverseCharge    = "No";
-        TransportName    = string.Empty;
-        DateOfSupply     = DateTimeOffset.Now;
-        PlaceOfSupply    = string.Empty;
+        TransportName    = "Mahendra";
+        PlaceOfSupply    = "Mumbai";
     }
 }

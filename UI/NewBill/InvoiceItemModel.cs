@@ -12,6 +12,8 @@ public class InvoiceItemModel : INotifyPropertyChanged
     private decimal _qty = 1;
     private string _uom  = "Pcs";
     private decimal _rate;
+    private decimal _taxRate;
+    private string _productCode = string.Empty;
 
     // Row index — set by ViewModel after collection changes
     public int SNo { get; set; }
@@ -21,6 +23,12 @@ public class InvoiceItemModel : INotifyPropertyChanged
     public string Size { get => _size; set => Set(ref _size, value); }
     public string Hsn  { get => _hsn;  set => Set(ref _hsn,  value); }
     public string Uom  { get => _uom;  set => Set(ref _uom,  value); }
+
+    public string ProductCode
+    {
+        get => _productCode;
+        set => Set(ref _productCode, value);
+    }
 
     public decimal Qty
     {
@@ -32,6 +40,12 @@ public class InvoiceItemModel : INotifyPropertyChanged
     {
         get => _rate;
         set { Set(ref _rate, value); Recalculate(); }
+    }
+
+    public decimal TaxRate
+    {
+        get => _taxRate;
+        set => Set(ref _taxRate, value);
     }
 
     // Read-only — Qty * Rate

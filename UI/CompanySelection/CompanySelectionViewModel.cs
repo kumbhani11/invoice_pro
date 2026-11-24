@@ -10,6 +10,7 @@ using InvoicePro.Services;
 using InvoicePro.ViewModels;
 using InvoicePro.Views;
 using Microsoft.EntityFrameworkCore;
+using InvoicePro.Utils;
 
 namespace InvoicePro.UI.CompanySelection;
 
@@ -36,6 +37,17 @@ public partial class CompanySelectionViewModel : ViewModelBase
         return appFolder;
     }
 
+    private static void Log(string message)
+    {
+        try
+        {
+            var logPath = Path.Join(GetAppFolder(), "invoicepro.log");
+            var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}";
+            File.AppendAllText(logPath, line + Environment.NewLine);
+        }
+        catch { }
+    }
+
     [RelayCommand]
     private Task OpenAvaniAsync() => OpenCompanyAsync("AVANI ENTERPRISE", "AVANI_ENTERPRISE.db");
 
@@ -50,6 +62,7 @@ public partial class CompanySelectionViewModel : ViewModelBase
         IsLoading = true;
         LoadingMessage = $"Loading {companyName}...";
         ErrorMessage = string.Empty;
+        Log($"OpenCompanyAsync START: company={companyName} db={dbFileName}");
 
         // Yield to UI thread so the loading overlay renders before heavy work
         await Task.Yield();
@@ -57,20 +70,25 @@ public partial class CompanySelectionViewModel : ViewModelBase
         try
         {
             var dbPath = Path.Join(GetAppFolder(), dbFileName);
-            bool isNew = !File.Exists(dbPath);
+            Log($"DB path: {dbPath}  exists={File.Exists(dbPath)}");
 
             BillingDbContext.CurrentDatabasePath = dbPath;
             SessionContext.CurrentDatabasePath = dbPath;
+            Log("BillingDbContext.CurrentDatabasePath set");
 
             using (var db = new BillingDbContext())
             {
+                Log("Calling MigrateAsync...");
                 await db.Database.MigrateAsync();
+                Log("MigrateAsync done");
 
                 var company = await db.Companies.FirstOrDefaultAsync();
+                Log($"Company from DB: {company?.Name ?? "NULL"}");
                 var profile = DummyDataStore.GetCompanyProfile(companyName);
 
                 if (company == null)
                 {
+                    Log("Creating new company record");
                     company = new Company
                     {
                         Name = companyName,
@@ -90,6 +108,7 @@ public partial class CompanySelectionViewModel : ViewModelBase
                     };
                     db.Companies.Add(company);
                     await db.SaveChangesAsync();
+                    Log("New company saved");
                 }
                 else
                 {
@@ -103,6 +122,7 @@ public partial class CompanySelectionViewModel : ViewModelBase
 
                     if (needsHydration)
                     {
+                        Log("Hydrating company fields from profile");
                         company.Name = companyName;
                         company.RegisteredOffice = string.IsNullOrWhiteSpace(company.RegisteredOffice) ? profile.AddressLine1 : company.RegisteredOffice;
                         company.SalesOffice = string.IsNullOrWhiteSpace(company.SalesOffice) ? profile.AddressLine2 : company.SalesOffice;
@@ -115,36 +135,46 @@ public partial class CompanySelectionViewModel : ViewModelBase
                         company.BankAccount = string.IsNullOrWhiteSpace(company.BankAccount) ? profile.BankAccountNo : company.BankAccount;
                         company.IFSC = string.IsNullOrWhiteSpace(company.IFSC) ? profile.BankIFSC : company.IFSC;
                         await db.SaveChangesAsync();
+                        Log("Hydration saved");
                     }
                 }
 
                 SessionContext.CurrentCompany = company;
+                Log($"SessionContext.CurrentCompany set to: {company.Name}");
             }
 
             NavigationService.SetCompany?.Invoke(SessionContext.CurrentCompany?.Name ?? companyName);
             NavigationService.SetStatus?.Invoke("Ready");
+            Log($"_createMainWindowOnSelect={_createMainWindowOnSelect}");
 
             if (_createMainWindowOnSelect)
             {
+                Log("Creating MainViewModel and MainWindow");
                 var mainVm = new MainViewModel(companyName);
                 var mainWindow = new MainWindow { DataContext = mainVm };
                 mainWindow.Show();
+                Log("MainWindow shown, closing startup window");
                 _startupWindow.Close();
+                Log("Startup window closed");
             }
             else
             {
+                Log("Switch-company path: closing dialog");
                 _startupWindow.Close();
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Unable to load {companyName}. Please try again. {ex.Message}";
+            var msg = $"EXCEPTION in OpenCompanyAsync({companyName}): {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}";
+            Log(msg);
+            ErrorMessage = $"Unable to load {companyName}. Please try again.\n{ex.Message}";
             NavigationService.SetStatus?.Invoke($"Company load failed: {companyName}");
         }
         finally
         {
             IsLoading = false;
             LoadingMessage = string.Empty;
+            Log($"OpenCompanyAsync END: company={companyName}");
         }
     }
 }

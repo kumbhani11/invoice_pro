@@ -35,6 +35,10 @@ public class BillingDbContext : DbContext
             .WithOne(e => e.Invoice)
             .HasForeignKey(e => e.InvoiceId)
             .IsRequired();
+
+        modelBuilder.Entity<Invoice>()
+            .HasIndex(e => e.InvoiceNumber)
+            .IsUnique();
             
         // SQLite doesn't natively support decimal precision limits like SQL Server,
         // but it's good practice for when migrations are generated.

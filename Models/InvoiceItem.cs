@@ -13,7 +13,8 @@ public class InvoiceItem {
     public string UOM { get; set; } = string.Empty;
     
     // Calculation
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
     public decimal Rate { get; set; }
+    public decimal TaxRate { get; set; }
     public decimal Amount { get; set; }
 }

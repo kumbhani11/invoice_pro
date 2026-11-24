@@ -262,9 +262,12 @@ public class InvoiceDocument : IDocument
                         h.Cell().Border(1).BorderColor("#000000").Padding(2).AlignCenter().Text("Amount").Bold().FontSize(8);
                     });
 
-                    // GST 5% row
+                    // GST data row — label derived from actual rates
+                    string gstLabel = t.IgstRate > 0
+                        ? $"G.S.T {t.IgstRate:0.#}%"
+                        : $"G.S.T {(t.CgstRate + t.SgstRate):0.#}%";
                     IContainer TC() => table.Cell().Border(1).BorderColor("#000000").Padding(2).AlignCenter();
-                    TC().AlignLeft().Text("G.S.T 5%").Bold().FontSize(8);
+                    TC().AlignLeft().Text(gstLabel).Bold().FontSize(8);
                     TC().Text(t.CgstRate > 0 ? t.CgstRate.ToString("0.#") : "");
                     TC().Text(t.CgstAmount > 0 ? t.CgstAmount.ToString("F2") : "");
                     TC().Text(t.SgstRate > 0 ? t.SgstRate.ToString("0.#") : "");
